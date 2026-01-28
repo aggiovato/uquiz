@@ -7,24 +7,22 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "options",
+    tableName = "folders",
     foreignKeys = [
         ForeignKey(
-            entity = QuestionEntity::class,
+            entity = FolderEntity::class,
             parentColumns = ["id"],
-            childColumns = ["questionId"],
+            childColumns = ["parentId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("questionId")]
+    indices = [Index("parentId")]
 )
-data class OptionEntity(
+data class FolderEntity(
     @PrimaryKey
     val id: String,
-    val questionId: String,
-    val label: String,
-    val text: String,
-    val isCorrect: Boolean,
+    val name: String,
+    val parentId: String? = null,
     @Embedded
     val audit: AuditTimestamps = AuditTimestamps()
 )

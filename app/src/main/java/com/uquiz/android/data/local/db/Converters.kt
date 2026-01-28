@@ -1,6 +1,8 @@
 package com.uquiz.android.data.local.db
 
 import androidx.room.TypeConverter
+import com.uquiz.android.data.local.enums.AttemptMode
+import com.uquiz.android.data.local.enums.DifficultyLevel
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
@@ -26,4 +28,20 @@ class Converters {
     fun jsonToStringList(value: String): List<String> =
         if (value.isBlank()) emptyList()
         else json.decodeFromString(listOfStringSerializer, value)
+
+    // DifficultyLevel converters
+    @TypeConverter
+    fun difficultyLevelToString(value: DifficultyLevel): String = value.name
+
+    @TypeConverter
+    fun stringToDifficultyLevel(value: String): DifficultyLevel =
+        DifficultyLevel.valueOf(value)
+
+    // AttemptMode converters
+    @TypeConverter
+    fun attemptModeToString(value: AttemptMode): String = value.name
+
+    @TypeConverter
+    fun stringToAttemptMode(value: String): AttemptMode =
+        AttemptMode.valueOf(value)
 }

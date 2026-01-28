@@ -37,6 +37,13 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // Room schema export
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+        arg("room.incremental", "true")
+        arg("room.generateKotlin", "true")
+    }
 }
 
 dependencies {
