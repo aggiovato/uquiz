@@ -1,0 +1,44 @@
+@startuml ranking-er
+
+!include ../_styles.iuml
+
+title <size:16><b>Ranking Domain</b></size>\n<size:11><color:#60727F>UserRank</color></size>
+
+entity "user_rank" as UserRank <<ranking>> {
+    PK(userId)              : TEXT
+    ==
+    currentRank             : TEXT    NOT NULL
+    ..INITIATE|NEOPHYTE|ACOLYTE|DISCIPLE..
+    ..ADEPT|VIRTUOSO|ARCHON|PARAGON..
+    mmr                     : REAL    NOT NULL  DEFAULT 1200.0
+    perfEwma                : REAL    NOT NULL  DEFAULT 0.5
+    lifetimeCorrect         : INTEGER NOT NULL  DEFAULT 0
+    lifetimeIncorrect       : INTEGER NOT NULL  DEFAULT 0
+    lifetimeTimeout         : INTEGER NOT NULL  DEFAULT 0
+    totalGameAnswers        : INTEGER NOT NULL  DEFAULT 0
+    totalStudyAnswers       : INTEGER NOT NULL  DEFAULT 0
+    lastRankChangeAt        : INTEGER NULL
+    answersSinceRankChange  : INTEGER NOT NULL  DEFAULT 0
+    totalXp                 : INTEGER NOT NULL  DEFAULT 0
+    createdAt               : INTEGER NOT NULL
+    updatedAt               : INTEGER NOT NULL
+}
+
+note right of UserRank
+  Escala MMR:
+  < 800   INITIATE
+  < 1100  NEOPHYTE
+  < 1400  ACOLYTE
+  < 1700  DISCIPLE
+  < 2100  ADEPT
+  < 2500  VIRTUOSO
+  < 3000  ARCHON
+  >= 3000 PARAGON
+
+  PK = userId (1:1 con UserProfile).
+  mmr acumulado por sesion completada.
+  perfEwma = media exponencial del
+  rendimiento reciente (0.0-1.0).
+end note
+
+@enduml

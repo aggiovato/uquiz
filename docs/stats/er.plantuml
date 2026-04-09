@@ -1,0 +1,77 @@
+@startuml stats-er
+
+!include ../_styles.iuml
+
+title <size:16><b>Stats Domain</b></size>\n<size:11><color:#60727F>QuestionStats · PackStats</color></size>
+
+entity "question_stats" as QuestionStats <<stats>> {
+    PK(id)                  : TEXT
+    ==
+    userId                  : TEXT  NOT NULL
+    FK(questionId)          : TEXT  NOT NULL
+    FK(packId)              : TEXT  NOT NULL
+    totalAttempts           : INTEGER NOT NULL  DEFAULT 0
+    totalCorrect            : INTEGER NOT NULL  DEFAULT 0
+    totalIncorrect          : INTEGER NOT NULL  DEFAULT 0
+    totalTimeout            : INTEGER NOT NULL  DEFAULT 0
+    studyAttempts           : INTEGER NOT NULL  DEFAULT 0
+    studyCorrect            : INTEGER NOT NULL  DEFAULT 0
+    gameAttempts            : INTEGER NOT NULL  DEFAULT 0
+    gameCorrect             : INTEGER NOT NULL  DEFAULT 0
+    avgGameTimeMs           : INTEGER NULL
+    bestGameTimeMs          : INTEGER NULL
+    currentCorrectStreak    : INTEGER NOT NULL  DEFAULT 0
+    bestCorrectStreak       : INTEGER NOT NULL  DEFAULT 0
+    masteryScore            : REAL    NOT NULL  DEFAULT 0.0
+    masteryLevel            : TEXT    NOT NULL
+    ..QuestionMasteryLevel: NEW|LEARNING|PRACTICED|MASTERED..
+    lastAnsweredAt          : INTEGER NULL
+    createdAt               : INTEGER NOT NULL
+    updatedAt               : INTEGER NOT NULL
+}
+
+entity "pack_stats" as PackStats <<stats>> {
+    PK(id)                      : TEXT
+    ==
+    userId                      : TEXT  NOT NULL
+    FK(packId)                  : TEXT  NOT NULL
+    totalSessions               : INTEGER NOT NULL  DEFAULT 0
+    totalStudySessions          : INTEGER NOT NULL  DEFAULT 0
+    totalGameSessions           : INTEGER NOT NULL  DEFAULT 0
+    averageAccuracyPercent      : INTEGER NULL
+    averageStudyAccuracyPercent : INTEGER NULL
+    averageGameAccuracyPercent  : INTEGER NULL
+    averageDurationMs           : INTEGER NULL
+    averageStudyDurationMs      : INTEGER NULL
+    averageGameDurationMs       : INTEGER NULL
+    bestScore                   : INTEGER NULL
+    bestStudyAccuracyPercent    : INTEGER NULL
+    bestGameScore               : INTEGER NULL
+    lastSessionAt               : INTEGER NULL
+    lastSessionMode             : TEXT    NULL
+    mostUsedMode                : TEXT    NULL
+    ..AttemptMode: STUDY|GAME..
+    dominatedQuestions          : INTEGER NOT NULL  DEFAULT 0
+    totalQuestionsSnapshot      : INTEGER NOT NULL  DEFAULT 0
+    progressPercent             : INTEGER NOT NULL  DEFAULT 0
+    createdAt                   : INTEGER NOT NULL
+    updatedAt                   : INTEGER NOT NULL
+}
+
+QuestionStats   }o--||  QuestionStats   : "questionId / CASCADE"
+PackStats       }o--||  PackStats       : "packId / CASCADE"
+
+note right of QuestionStats
+  masteryScore (0.0-1.0) determina
+  masteryLevel de forma continua.
+  userId sin FK: el historial
+  se preserva si se borra el usuario.
+end note
+
+note right of PackStats
+  progressPercent =
+  dominatedQuestions /
+  totalQuestionsSnapshot * 100.
+end note
+
+@enduml

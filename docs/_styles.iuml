@@ -1,0 +1,114 @@
+' ============================================================
+' UQuiz - Shared diagram styles
+' Include this file at the top of every detailed .plantuml:
+'   !include ../_styles.iuml
+' ============================================================
+
+!define PK(x)  <b><u>x</u></b>
+!define FK(x)  <i>x</i>
+
+skinparam defaultFontName    "Helvetica, Arial, sans-serif"
+skinparam defaultFontSize    12
+skinparam defaultFontColor   #243242
+skinparam backgroundColor    #F5F7F7
+skinparam roundcorner        8
+skinparam shadowing          false
+skinparam linetype           ortho
+
+skinparam arrow {
+    Color      #60727F
+    FontColor  #60727F
+    FontSize   10
+}
+
+' ── content  (Navy) ──────────────────────────────────────────
+skinparam entity<<content>> {
+    HeaderBackgroundColor   #134C8F
+    BackgroundColor         #F3F7FC
+    BorderColor             #113A6A
+    FontColor               #FFFFFF
+    AttributeFontColor      #243242
+    AttributeFontSize       11
+    StereotypeFontColor     #BDD4EF
+    StereotypeFontSize      10
+}
+
+' ── join tables inside content ────────────────────────────────
+skinparam entity<<join>> {
+    HeaderBackgroundColor   #113A6A
+    BackgroundColor         #E3ECF8
+    BorderColor             #0E2743
+    FontColor               #FFFFFF
+    AttributeFontColor      #243242
+    AttributeFontSize       11
+    StereotypeFontColor     #91B9E8
+    StereotypeFontSize      10
+}
+
+' ── attempts (Teal) ──────────────────────────────────────────
+skinparam entity<<attempts>> {
+    HeaderBackgroundColor   #00CBA5
+    BackgroundColor         #F0FCFA
+    BorderColor             #00957F
+    FontColor               #005450
+    AttributeFontColor      #243242
+    AttributeFontSize       11
+    StereotypeFontColor     #00957F
+    StereotypeFontSize      10
+}
+
+skinparam entity<<join-attempts>> {
+    HeaderBackgroundColor   #00957F
+    BackgroundColor         #E0F9F4
+    BorderColor             #005450
+    FontColor               #FFFFFF
+    AttributeFontColor      #243242
+    AttributeFontSize       11
+}
+
+' ── stats (Gold) ─────────────────────────────────────────────
+skinparam entity<<stats>> {
+    HeaderBackgroundColor   #E5A91D
+    BackgroundColor         #FFFCF2
+    BorderColor             #B77707
+    FontColor               #6A4300
+    AttributeFontColor      #243242
+    AttributeFontSize       11
+    StereotypeFontColor     #B77707
+    StereotypeFontSize      10
+}
+
+' ── ranking (Purple) ─────────────────────────────────────────
+skinparam entity<<ranking>> {
+    HeaderBackgroundColor   #7446DA
+    BackgroundColor         #F8F5FF
+    BorderColor             #5630A9
+    FontColor               #FFFFFF
+    AttributeFontColor      #243242
+    AttributeFontSize       11
+    StereotypeFontColor     #D5C1FF
+    StereotypeFontSize      10
+}
+
+' ── user (Neutral) ───────────────────────────────────────────
+skinparam entity<<user>> {
+    HeaderBackgroundColor   #455563
+    BackgroundColor         #F5F7F7
+    BorderColor             #243242
+    FontColor               #FFFFFF
+    AttributeFontColor      #243242
+    AttributeFontSize       11
+    StereotypeFontColor     #BCC4C9
+    StereotypeFontSize      10
+}
+
+skinparam entity<<datastore>> {
+    HeaderBackgroundColor   #243242
+    BackgroundColor         #F5F7F7
+    BorderColor             #192636
+    FontColor               #FFFFFF
+    AttributeFontColor      #455563
+    AttributeFontSize       11
+    StereotypeFontColor     #99A5AD
+    StereotypeFontSize      10
+}

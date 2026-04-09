@@ -3,22 +3,30 @@ package com.uquiz.android.data.local.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.uquiz.android.data.local.dao.AttemptAnswerDao
-import com.uquiz.android.data.local.dao.AttemptDao
-import com.uquiz.android.data.local.dao.AttemptPackDao
-import com.uquiz.android.data.local.dao.FolderDao
-import com.uquiz.android.data.local.dao.OptionDao
-import com.uquiz.android.data.local.dao.PackDao
-import com.uquiz.android.data.local.dao.PackQuestionDao
-import com.uquiz.android.data.local.dao.QuestionDao
-import com.uquiz.android.data.local.entity.AttemptAnswerEntity
-import com.uquiz.android.data.local.entity.AttemptEntity
-import com.uquiz.android.data.local.entity.AttemptPackEntity
-import com.uquiz.android.data.local.entity.FolderEntity
-import com.uquiz.android.data.local.entity.OptionEntity
-import com.uquiz.android.data.local.entity.PackEntity
-import com.uquiz.android.data.local.entity.PackQuestionEntity
-import com.uquiz.android.data.local.entity.QuestionEntity
+import com.uquiz.android.data.attempts.dao.AttemptAnswerDao
+import com.uquiz.android.data.attempts.dao.AttemptDao
+import com.uquiz.android.data.attempts.dao.AttemptPackDao
+import com.uquiz.android.data.content.dao.FolderDao
+import com.uquiz.android.data.content.dao.OptionDao
+import com.uquiz.android.data.content.dao.PackDao
+import com.uquiz.android.data.content.dao.PackQuestionDao
+import com.uquiz.android.data.stats.dao.PackStatsDao
+import com.uquiz.android.data.content.dao.QuestionDao
+import com.uquiz.android.data.stats.dao.QuestionStatsDao
+import com.uquiz.android.data.ranking.dao.UserRankDao
+import com.uquiz.android.data.user.dao.UserProfileDao
+import com.uquiz.android.data.attempts.entity.AttemptAnswerEntity
+import com.uquiz.android.data.attempts.entity.AttemptEntity
+import com.uquiz.android.data.attempts.entity.AttemptPackEntity
+import com.uquiz.android.data.content.entity.FolderEntity
+import com.uquiz.android.data.content.entity.OptionEntity
+import com.uquiz.android.data.content.entity.PackEntity
+import com.uquiz.android.data.content.entity.PackQuestionEntity
+import com.uquiz.android.data.stats.entity.PackStatsEntity
+import com.uquiz.android.data.stats.entity.QuestionStatsEntity
+import com.uquiz.android.data.content.entity.QuestionEntity
+import com.uquiz.android.data.ranking.entity.UserRankEntity
+import com.uquiz.android.data.user.entity.UserProfileEntity
 
 @Database(
     entities = [
@@ -29,9 +37,13 @@ import com.uquiz.android.data.local.entity.QuestionEntity
         PackQuestionEntity::class,
         AttemptEntity::class,
         AttemptPackEntity::class,
-        AttemptAnswerEntity::class
+        AttemptAnswerEntity::class,
+        UserProfileEntity::class,
+        QuestionStatsEntity::class,
+        PackStatsEntity::class,
+        UserRankEntity::class
     ],
-    version = 2,
+    version = 11,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -47,4 +59,8 @@ abstract class UQuizDatabase : RoomDatabase() {
     abstract fun attemptDao(): AttemptDao
     abstract fun attemptPackDao(): AttemptPackDao
     abstract fun attemptAnswerDao(): AttemptAnswerDao
+    abstract fun userProfileDao(): UserProfileDao
+    abstract fun questionStatsDao(): QuestionStatsDao
+    abstract fun packStatsDao(): PackStatsDao
+    abstract fun userRankDao(): UserRankDao
 }

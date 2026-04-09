@@ -1,0 +1,35 @@
+@startuml user-er
+
+!include ../_styles.iuml
+
+title <size:16><b>User Domain</b></size>\n<size:11><color:#60727F>UserProfile · UserPreferences</color></size>
+
+entity "user_profiles" as UserProfile <<user>> {
+    PK(id)              : TEXT
+    ==
+    displayName         : TEXT  NOT NULL
+    avatarIcon          : TEXT  NULL
+    avatarImageUri      : TEXT  NULL
+    createdAt           : INTEGER NOT NULL
+    updatedAt           : INTEGER NOT NULL
+}
+
+entity "UserPreferences" as UserPreferences <<datastore>> {
+    languageCode            : TEXT     DEFAULT "en"
+    themeMode               : TEXT
+    ..AppThemeMode: LIGHT|DARK|SYSTEM..
+    practiceReminderEnabled : BOOLEAN  DEFAULT false
+    practiceReminderHour    : INTEGER  DEFAULT 20
+    practiceReminderMinute  : INTEGER  DEFAULT 0
+    practiceReminderDays    : TEXT
+    ..Set<String>: MON|TUE|WED|THU|FRI|SAT|SUN..
+}
+
+UserProfile ..> UserPreferences : "mismo userId\n(CurrentUserRepository)"
+
+note right of UserPreferences
+  No es una tabla Room.
+  Persiste en DataStore (Proto).
+end note
+
+@enduml

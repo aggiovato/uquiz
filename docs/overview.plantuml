@@ -1,0 +1,100 @@
+@startuml overview
+
+!include _styles-overview.iuml
+
+title <size:18><b>UQuiz - Domain Overview</b></size>\n<size:12><color:#60727F>Relaciones entre grupos de dominio</color></size>
+
+package "content" #E3ECF8 {
+    entity "Folder" as Folder <<content>> {
+        id, name, parentId
+        colorHex, icon
+    }
+    entity "Pack" as Pack <<content>> {
+        id, title, folderId
+        description, icon, colorHex
+    }
+    entity "Question" as Question <<content>> {
+        id, text, difficulty
+        explanation
+    }
+    entity "Option" as Option <<content>> {
+        id, questionId
+        label, text, isCorrect
+    }
+    entity "pack_questions" as PackQuestion <<join>> {
+        PK(packId, questionId)
+        sortOrder
+    }
+}
+
+package "attempts" #E0F9F4 {
+    entity "Attempt" as Attempt <<attempts>> {
+        id, userId, mode, status
+        primaryPackId, score
+    }
+    entity "AttemptAnswer" as AttemptAnswer <<attempts>> {
+        attemptId, questionId
+        pickedOptionId, isCorrect
+    }
+    entity "attempt_packs" as AttemptPack <<join-attempts>> {
+        PK(attemptId, packId)
+    }
+}
+
+package "stats" #FFF3D6 {
+    entity "QuestionStats" as QStats <<stats>> {
+        userId, questionId, packId
+        masteryLevel, masteryScore
+    }
+    entity "PackStats" as PStats <<stats>> {
+        userId, packId
+        progressPercent, dominatedQuestions
+    }
+}
+
+package "ranking" #EBE2FF {
+    entity "UserRank" as URank <<ranking>> {
+        userId (PK)
+        currentRank, mmr, perfEwma
+        totalXp
+    }
+}
+
+package "user" #ECF0F1 {
+    entity "UserProfile" as UProfile <<user>> {
+        id, displayName
+        avatarIcon, avatarImageUri
+    }
+    entity "UserPreferences\n(DataStore)" as UPrefs <<datastore>> {
+        languageCode, themeMode
+        practiceReminder*
+    }
+}
+
+Folder      ||--o{  Pack            : "contiene"
+Pack        }o--o{  Question        : "pack_questions"
+Question    ||--|{  Option          : "tiene"
+
+Attempt     ||--|{  AttemptAnswer   : "respuestas"
+Attempt     }o--o{  Pack            : "attempt_packs"
+AttemptAnswer }o--|| Question       : "ref"
+AttemptAnswer }o--o| Option         : "pickedOption"
+
+QStats      }o--||  Question        : "stats de"
+QStats      }o--||  Pack            : "en pack"
+PStats      }o--||  Pack            : "stats de"
+
+UProfile    ||--||  URank           : "1:1 userId"
+UProfile    ..>     UPrefs          : "mismo userId"
+
+Attempt     ..>     UProfile        : "userId (sin FK)"
+QStats      ..>     UProfile        : "userId (sin FK)"
+PStats      ..>     UProfile        : "userId (sin FK)"
+URank       ..>     UProfile        : "userId = PK"
+
+note as N1
+  Lineas solidas  = FK con CASCADE
+  Lineas punteadas = referencia logica sin FK
+end note
+
+@enduml

@@ -38,6 +38,10 @@ android {
         compose = true
     }
 
+    lint {
+        lintConfig = file("lint.xml")
+    }
+
     // Room schema export
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
@@ -55,6 +59,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -77,4 +82,11 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.coil.compose)
+
+    // Markdown rendering
+    implementation(libs.markwon.core)
 }

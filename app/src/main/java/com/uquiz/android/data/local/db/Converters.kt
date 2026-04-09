@@ -1,8 +1,11 @@
 package com.uquiz.android.data.local.db
 
 import androidx.room.TypeConverter
-import com.uquiz.android.data.local.enums.AttemptMode
-import com.uquiz.android.data.local.enums.DifficultyLevel
+import com.uquiz.android.domain.attempts.enums.AttemptMode
+import com.uquiz.android.domain.attempts.enums.AttemptStatus
+import com.uquiz.android.domain.content.enums.DifficultyLevel
+import com.uquiz.android.domain.stats.enums.QuestionMasteryLevel
+import com.uquiz.android.domain.ranking.enums.UserRank
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
@@ -44,4 +47,25 @@ class Converters {
     @TypeConverter
     fun stringToAttemptMode(value: String): AttemptMode =
         AttemptMode.valueOf(value)
+
+    @TypeConverter
+    fun attemptStatusToString(value: AttemptStatus): String = value.name
+
+    @TypeConverter
+    fun stringToAttemptStatus(value: String): AttemptStatus =
+        AttemptStatus.valueOf(value)
+
+    @TypeConverter
+    fun questionMasteryLevelToString(value: QuestionMasteryLevel): String = value.name
+
+    @TypeConverter
+    fun stringToQuestionMasteryLevel(value: String): QuestionMasteryLevel =
+        QuestionMasteryLevel.valueOf(value)
+
+    @TypeConverter
+    fun userRankToString(value: UserRank): String = value.name
+
+    @TypeConverter
+    fun stringToUserRank(value: String): UserRank =
+        UserRank.valueOf(value)
 }

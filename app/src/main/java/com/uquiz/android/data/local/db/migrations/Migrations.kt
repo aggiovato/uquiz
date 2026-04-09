@@ -146,3 +146,66 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         db.execSQL("CREATE INDEX IF NOT EXISTS index_attempt_answers_pickedOptionId ON attempt_answers(pickedOptionId)")
     }
 }
+
+/**
+ * Migration from version 10 to version 11.
+ *
+ * Adds CHECK constraints on content name/description lengths:
+ * - `folders.name`: max 100 characters
+ * - `packs.title`: max 100 characters
+ * - `packs.description`: max 200 characters (nullable, only checked when non-null)
+ *
+ * SQLite does not support ALTER TABLE ADD CONSTRAINT, so each table is recreated
+ * following the standard copy-drop-rename pattern with foreign keys disabled.
+ */
+val MIGRATION_10_11 = object : Migration(10, 11) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("PRAGMA foreign_keys = OFF")
+
+        // --- folders ---
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS folders_new (
+                id TEXT PRIMARY KEY NOT NULL,
+                name TEXT NOT NULL CHECK(length(name) <= 100),
+                parentId TEXT,
+                colorHex TEXT,
+                icon TEXT,
+                createdAt INTEGER NOT NULL,
+                updatedAt INTEGER NOT NULL,
+                FOREIGN KEY(parentId) REFERENCES folders(id) ON DELETE CASCADE
+            )
+        """.trimIndent())
+        db.execSQL(
+            "INSERT INTO folders_new (id, name, parentId, colorHex, icon, createdAt, updatedAt) " +
+            "SELECT id, name, parentId, colorHex, icon, createdAt, updatedAt FROM folders"
+        )
+        db.execSQL("DROP TABLE folders")
+        db.execSQL("ALTER TABLE folders_new RENAME TO folders")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_folders_parentId ON folders(parentId)")
+
+        // --- packs ---
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS packs_new (
+                id TEXT PRIMARY KEY NOT NULL,
+                title TEXT NOT NULL CHECK(length(title) <= 100),
+                description TEXT CHECK(description IS NULL OR length(description) <= 200),
+                folderId TEXT NOT NULL,
+                icon TEXT,
+                colorHex TEXT,
+                createdAt INTEGER NOT NULL,
+                updatedAt INTEGER NOT NULL,
+                FOREIGN KEY(folderId) REFERENCES folders(id) ON DELETE CASCADE
+            )
+        """.trimIndent())
+        db.execSQL(
+            "INSERT INTO packs_new (id, title, description, folderId, icon, colorHex, createdAt, updatedAt) " +
+            "SELECT id, title, description, folderId, icon, colorHex, createdAt, updatedAt FROM packs"
+        )
+        db.execSQL("DROP TABLE packs")
+        db.execSQL("ALTER TABLE packs_new RENAME TO packs")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_packs_folderId ON packs(folderId)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_packs_updatedAt ON packs(updatedAt)")
+
+        db.execSQL("PRAGMA foreign_keys = ON")
+    }
+}

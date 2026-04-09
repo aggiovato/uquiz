@@ -1,0 +1,35 @@
+package com.uquiz.android.ui.navigation
+
+object Routes {
+    const val HOME = "home"
+    const val LIBRARY = "library"
+    const val GAME = "game"
+    const val STATS = "stats"
+    const val FOLDER = "folder"
+    const val PACK = "pack"
+    const val STUDY = "study"
+    const val STUDY_SESSION = "study_session"
+    const val STUDY_SUMMARY = "study_summary"
+    const val QUICK_GAME = "quick_game"
+    const val QUESTION_CREATE = "question_create"
+    const val QUESTION_EDIT = "question_edit"
+    const val PACK_STATS = "pack_stats"
+    const val PACK_STATS_HELP = "pack_stats_help"
+    const val PREFERENCES = "preferences"
+
+    const val ARG_FOLDER_ID = "folderId"
+    const val ARG_PACK_ID = "packId"
+    const val ARG_QUESTION_ID = "questionId"
+    const val ARG_ATTEMPT_ID = "attemptId"
+
+    fun folderRoute(folderId: String) = "$FOLDER/$folderId"
+    fun packRoute(packId: String) = "$PACK/$packId"
+    fun studyRoute(packId: String) = "$STUDY/$packId"
+    fun studySessionRoute(packId: String) = "$STUDY_SESSION/$packId"
+    fun studySummaryRoute(attemptId: String) = "$STUDY_SUMMARY/$attemptId"
+    fun quickGameRoute(packId: String) = "$QUICK_GAME/$packId"
+    fun questionCreateRoute(packId: String) = "$QUESTION_CREATE/$packId"
+    fun questionEditRoute(packId: String, questionId: String) = "$QUESTION_EDIT/$packId/$questionId"
+    fun packStatsRoute(packId: String) = "$PACK_STATS/$packId"
+    fun packStatsHelpRoute(packId: String) = "$PACK_STATS_HELP/$packId"
+}

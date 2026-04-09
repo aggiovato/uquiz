@@ -1,0 +1,15 @@
+' ============================================================
+' UQuiz - Overview diagram styles (compact, high-level)
+' Include this file at the top of overview .plantuml files:
+'   !include _styles-overview.iuml
+' ============================================================
+
+!include _styles.iuml
+
+skinparam package {
+    BorderColor          #BCC4C9
+    BackgroundColor      #F5F7F7
+    FontColor            #243242
+    FontSize             13
+    FontStyle            bold
+}

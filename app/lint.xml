@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!--
+        Composable components intentionally place 'variant' or other behavioral params
+        before 'modifier' to keep the API readable (variant first, then standard Compose
+        plumbing). The ModifierParameter check expects modifier to be the first optional
+        param, but our design pattern deliberately differs from that default ordering.
+    -->
+    <issue id="ModifierParameter" severity="ignore" />
+</lint>
