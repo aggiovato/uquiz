@@ -4,11 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Relation
 import com.uquiz.android.data.content.entity.FolderEntity
 
-/**
- * Room relation: Folder with its Child Folders
- *
- * Used for building folder hierarchy (nested folders)
- */
+/** Relación Room: carpeta con sus subcarpetas directas. Usada para construir la jerarquía de carpetas. */
 data class FolderWithChildren(
     @Embedded
     val folder: FolderEntity,

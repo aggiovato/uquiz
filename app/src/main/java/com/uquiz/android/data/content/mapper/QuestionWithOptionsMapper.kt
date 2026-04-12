@@ -5,9 +5,11 @@ import com.uquiz.android.data.content.relations.OrderedQuestionWithOptions as Or
 import com.uquiz.android.domain.content.model.QuestionWithOptions as QuestionWithOptionsModel
 
 /**
- * Mapper: QuestionWithOptions (Room relation) <-> QuestionWithOptions (domain model)
+ * Mapeo de las relaciones Room [com.uquiz.android.data.content.relations.QuestionWithOptions]
+ * y [com.uquiz.android.data.content.relations.OrderedQuestionWithOptions] al modelo de dominio
+ * [com.uquiz.android.domain.content.model.QuestionWithOptions].
  */
-object QuestionWithOptionsMapper {
+internal object QuestionWithOptionsMapper {
 
     fun toModel(relation: QuestionWithOptionsRelation): QuestionWithOptionsModel {
         return QuestionWithOptionsModel(

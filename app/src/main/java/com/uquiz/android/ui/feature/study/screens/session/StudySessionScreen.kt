@@ -27,15 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.uquiz.android.ui.designsystem.tokens.BrandNavy
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.uquiz.android.core.analytics.FinalizeAttemptAnalyticsUseCase
+import com.uquiz.android.core.analytics.usecase.FinalizeAttemptAnalyticsUseCase
 import com.uquiz.android.domain.attempts.repository.AttemptRepository
 import com.uquiz.android.domain.content.enums.DifficultyLevel
 import com.uquiz.android.domain.content.repository.PackRepository
 import com.uquiz.android.ui.designsystem.components.buttons.UDarkButton
 import com.uquiz.android.ui.designsystem.components.buttons.UDarkButtonVariant
 import com.uquiz.android.ui.designsystem.preview.UPreview
+import com.uquiz.android.ui.designsystem.tokens.BrandNavy
 import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.feature.study.components.StudyExitDialog
 import com.uquiz.android.ui.feature.study.components.StudyExplanationDialog
@@ -76,12 +76,13 @@ fun StudySessionRoute(
 ) {
     val viewModel: StudySessionViewModel =
         viewModel(
-            factory = StudySessionViewModel.Factory(
-                packRepository = packRepository,
-                attemptRepository = attemptRepository,
-                finalizeAttemptAnalyticsUseCase = finalizeAttemptAnalyticsUseCase,
-                packId = packId,
-            ),
+            factory =
+                StudySessionViewModel.Factory(
+                    packRepository = packRepository,
+                    attemptRepository = attemptRepository,
+                    finalizeAttemptAnalyticsUseCase = finalizeAttemptAnalyticsUseCase,
+                    packId = packId,
+                ),
         )
     val uiState by viewModel.uiState.collectAsState()
     val scope = rememberCoroutineScope()
@@ -169,10 +170,11 @@ private fun StudySessionScreen(
 
             Column(modifier = Modifier.fillMaxSize()) {
                 StudySessionHeader(
-                    counter = strings.studyQuestionCounter(
-                        uiState.currentIndex + 1,
-                        uiState.totalQuestions,
-                    ),
+                    counter =
+                        strings.studySession.studyQuestionCounter(
+                            uiState.currentIndex + 1,
+                            uiState.totalQuestions,
+                        ),
                     packTitle = uiState.packTitle,
                     progress = uiState.progressFraction,
                     hasExplanation = !question?.explanationMarkdown.isNullOrBlank() && uiState.isCurrentVerified,
@@ -189,9 +191,10 @@ private fun StudySessionScreen(
 
                     Box(modifier = Modifier.weight(1f)) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .verticalScroll(optionsScrollState),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .verticalScroll(optionsScrollState),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             question.options.forEach { option ->
@@ -207,15 +210,16 @@ private fun StudySessionScreen(
                         // Degradado inferior que indica que hay más opciones por ver con scroll.
                         if (optionsScrollState.canScrollForward) {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(28.dp)
-                                    .align(Alignment.BottomCenter)
-                                    .background(
-                                        Brush.verticalGradient(
-                                            listOf(Color.Transparent, BrandNavy),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(28.dp)
+                                        .align(Alignment.BottomCenter)
+                                        .background(
+                                            Brush.verticalGradient(
+                                                listOf(Color.Transparent, BrandNavy),
+                                            ),
                                         ),
-                                    ),
                             )
                         }
                     }
@@ -224,7 +228,7 @@ private fun StudySessionScreen(
 
                     if (!uiState.isCurrentVerified) {
                         UDarkButton(
-                            text = strings.studyVerifyAnswer,
+                            text = strings.common.studyVerifyAnswer,
                             onClick = onVerify,
                             variant = UDarkButtonVariant.Secondary,
                             modifier = Modifier.fillMaxWidth(),
@@ -237,14 +241,14 @@ private fun StudySessionScreen(
                         ) {
                             if (uiState.canGoPrevious) {
                                 UDarkButton(
-                                    text = strings.studyPrevious,
+                                    text = strings.studySession.studyPrevious,
                                     onClick = onPrevious,
                                     variant = UDarkButtonVariant.Secondary,
                                     modifier = Modifier.weight(1f),
                                 )
                             }
                             UDarkButton(
-                                text = if (uiState.isLastQuestion) strings.studyFinish else strings.studyNext,
+                                text = if (uiState.isLastQuestion) strings.studySession.studyFinish else strings.studySession.studyNext,
                                 onClick = { if (uiState.isLastQuestion) onFinish() else onNext() },
                                 variant = UDarkButtonVariant.Secondary,
                                 modifier = Modifier.weight(1f),
@@ -268,33 +272,36 @@ private fun StudySessionScreen(
     }
 }
 
-
 @UPreview
 @Composable
 private fun StudySessionScreenPreview() {
     UTheme {
         StudySessionScreen(
-            uiState = StudySessionUiState(
-                isLoading = false,
-                packId = "preview",
-                packTitle = "Historia Universal",
-                questions = listOf(
-                    StudyQuestionUiModel(
-                        questionId = "q1",
-                        markdownText = "¿En qué año comenzó la **Primera Guerra Mundial**?" +
-                            "\n\nEsta fue una guerra que afectó a toda Europa.",
-                        explanationMarkdown = "El archiduque Francisco Fernando fue asesinado en 1914.",
-                        difficulty = DifficultyLevel.MEDIUM,
-                        options = listOf(
-                            StudyOptionUiModel("o1", "A", "1912", false),
-                            StudyOptionUiModel("o2", "B", "1914", true),
-                            StudyOptionUiModel("o3", "C", "1916", false),
-                            StudyOptionUiModel("o4", "D", "1918", false),
+            uiState =
+                StudySessionUiState(
+                    isLoading = false,
+                    packId = "preview",
+                    packTitle = "Historia Universal",
+                    questions =
+                        listOf(
+                            StudyQuestionUiModel(
+                                questionId = "q1",
+                                markdownText =
+                                    "¿En qué año comenzó la **Primera Guerra Mundial**?" +
+                                        "\n\nEsta fue una guerra que afectó a toda Europa.",
+                                explanationMarkdown = "El archiduque Francisco Fernando fue asesinado en 1914.",
+                                difficulty = DifficultyLevel.MEDIUM,
+                                options =
+                                    listOf(
+                                        StudyOptionUiModel("o1", "A", "1912", false),
+                                        StudyOptionUiModel("o2", "B", "1914", true),
+                                        StudyOptionUiModel("o3", "C", "1916", false),
+                                        StudyOptionUiModel("o4", "D", "1918", false),
+                                    ),
+                            ),
                         ),
-                    ),
+                    currentIndex = 0,
                 ),
-                currentIndex = 0,
-            ),
             onSelectOption = {},
             onVerify = {},
             onPrevious = {},

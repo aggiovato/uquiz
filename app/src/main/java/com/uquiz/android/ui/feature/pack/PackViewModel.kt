@@ -16,6 +16,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel del detalle de pack.
+ *
+ * Combina los metadatos del pack, sus preguntas y sus estadísticas resumidas,
+ * además de coordinar reorder, edición, borrado y visibilidad del bottom sheet
+ * de estadísticas.
+ */
 class PackViewModel(
     private val packRepository: PackRepository,
     private val packStatsRepository: PackStatsRepository,
@@ -81,12 +88,14 @@ class PackViewModel(
         PackOverviewUiState(packId = packId)
     )
 
+    /** Persiste el nuevo orden de preguntas tras una operación de drag and drop. */
     fun reorderQuestions(orderedQuestionIds: List<String>) {
         viewModelScope.launch {
             packRepository.reorderQuestions(packId, orderedQuestionIds)
         }
     }
 
+    /** Abre el diálogo de edición del pack actual. */
     fun onEditPackRequested() {
         val current = uiState.value
         if (current.packTitle.isBlank()) return
@@ -95,6 +104,7 @@ class PackViewModel(
         }
     }
 
+    /** Aplica los cambios confirmados para el pack actual. */
     fun onEditPackConfirmed(title: String, description: String?, colorHex: String, icon: String) {
         viewModelScope.launch {
             val pack = packRepository.getById(packId) ?: return@launch
@@ -110,24 +120,29 @@ class PackViewModel(
         }
     }
 
+    /** Cierra cualquier diálogo activo de la pantalla. */
     fun onDialogDismissed() {
         dialogState.value = PackDialogState.None
     }
 
+    /** Muestra el bottom sheet con estadísticas resumidas. */
     fun onStatsRequested() {
         showStatsSheet.value = true
     }
 
+    /** Oculta el bottom sheet de estadísticas. */
     fun onStatsDismissed() {
         showStatsSheet.value = false
     }
 
+    /** Abre el diálogo de borrado del pack actual. */
     fun onDeletePackRequested() {
         viewModelScope.launch {
             packRepository.getById(packId)?.let { dialogState.value = PackDialogState.DeletePack(it) }
         }
     }
 
+    /** Elimina el pack actual y notifica al caller para volver atrás. */
     fun onDeletePackConfirmed(onDeleted: () -> Unit) {
         viewModelScope.launch {
             val pack = packRepository.getById(packId) ?: return@launch
@@ -137,6 +152,7 @@ class PackViewModel(
         }
     }
 
+    /** Factory que resuelve las dependencias requeridas por [PackViewModel]. */
     class Factory(
         private val packRepository: PackRepository,
         private val packStatsRepository: PackStatsRepository,

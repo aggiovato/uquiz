@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fuerza el fondo del splash en modo oscuro al mismo valor claro que en modo día. -->
+    <color name="splash_background">#F5F7F7</color>
+</resources>

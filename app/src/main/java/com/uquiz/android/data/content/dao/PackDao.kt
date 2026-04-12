@@ -12,8 +12,14 @@ import com.uquiz.android.data.content.relations.PackWithQuestions
 import com.uquiz.android.data.content.relations.PackWithQuestionsAndOptions
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * ### PackDao
+ *
+ * Acceso reactivo y puntual a la tabla `packs` y sus relaciones con preguntas y opciones.
+ */
 @Dao
 interface PackDao {
+
     @Upsert
     suspend fun upsertPack(pack: PackEntity)
 
@@ -23,12 +29,14 @@ interface PackDao {
     @Query("SELECT * FROM packs WHERE id = :packId LIMIT 1")
     fun observePack(packId: String): Flow<PackEntity?>
 
+    /** Elimina todas las entradas de `pack_questions` para el pack dado antes de reinsertar. */
     @Query("DELETE FROM pack_questions WHERE packId = :packId")
     suspend fun clearPackQuestions(packId: String)
 
     @Upsert
     suspend fun upsertPackQuestions(rows: List<PackQuestionEntity>)
 
+    /** Observa las preguntas del pack ordenadas por [sortOrder], incluyendo sus opciones. */
     @Transaction
     @Query(
         """
@@ -41,30 +49,19 @@ interface PackDao {
     )
     fun observeOrderedQuestionWithOptions(packId: String): Flow<List<OrderedQuestionWithOptions>>
 
-    /**
-     * Get pack with all its questions
-     */
     @Transaction
     @Query("SELECT * FROM packs WHERE id = :packId")
     suspend fun getPackWithQuestions(packId: String): PackWithQuestions?
 
-    /**
-     * Get pack with questions and their options (nested relation)
-     */
+    /** Devuelve el pack con todas sus preguntas y opciones anidadas. Usado para iniciar una sesión. */
     @Transaction
     @Query("SELECT * FROM packs WHERE id = :packId")
     suspend fun getPackWithQuestionsAndOptions(packId: String): PackWithQuestionsAndOptions?
 
-    /**
-     * Observe pack with questions and options
-     */
     @Transaction
     @Query("SELECT * FROM packs WHERE id = :packId")
     fun observePackWithQuestionsAndOptions(packId: String): Flow<PackWithQuestionsAndOptions?>
 
-    /**
-     * Get all packs in a folder
-     */
     @Query("SELECT * FROM packs WHERE folderId = :folderId ORDER BY title ASC")
     suspend fun getByFolderId(folderId: String): List<PackEntity>
 
@@ -84,9 +81,6 @@ interface PackDao {
         excludeId: String? = null,
     ): Boolean
 
-    /**
-     * Observe all packs in a folder
-     */
     @Query("SELECT * FROM packs WHERE folderId = :folderId ORDER BY title ASC")
     fun observeByFolderId(folderId: String): Flow<List<PackEntity>>
 
@@ -119,9 +113,7 @@ interface PackDao {
     )
     fun observeAllWithQuestionCounts(): Flow<List<PackWithQuestionCountEntity>>
 
-    /**
-     * Delete pack by ID (cascades to pack_questions)
-     */
+    /** Elimina el pack por ID en cascada (entradas de `pack_questions` incluidas). */
     @Query("DELETE FROM packs WHERE id = :id")
     suspend fun deleteById(id: String)
 }

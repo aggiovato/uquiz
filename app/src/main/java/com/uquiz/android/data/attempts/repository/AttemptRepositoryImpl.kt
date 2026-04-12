@@ -3,14 +3,17 @@ package com.uquiz.android.data.attempts.repository
 import com.uquiz.android.data.attempts.dao.AttemptAnswerDao
 import com.uquiz.android.data.attempts.dao.AttemptDao
 import com.uquiz.android.data.attempts.dao.AttemptPackDao
+import com.uquiz.android.data.attempts.dao.AttemptQuestionPlanDao
 import com.uquiz.android.data.attempts.entity.AttemptPackEntity
 import com.uquiz.android.domain.attempts.enums.AttemptMode
 import com.uquiz.android.domain.attempts.enums.AttemptStatus
 import com.uquiz.android.data.attempts.mapper.AttemptAnswerMapper
 import com.uquiz.android.data.attempts.mapper.AttemptMapper
+import com.uquiz.android.data.attempts.mapper.AttemptQuestionPlanMapper
 import com.uquiz.android.domain.attempts.projection.ActivePackProgress
 import com.uquiz.android.domain.attempts.model.Attempt
 import com.uquiz.android.domain.attempts.model.AttemptAnswer
+import com.uquiz.android.domain.attempts.model.AttemptQuestionPlan
 import com.uquiz.android.domain.user.repository.CurrentUserRepository
 import com.uquiz.android.domain.attempts.repository.AttemptRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,7 +31,8 @@ class AttemptRepositoryImpl(
     private val attemptDao: AttemptDao,
     private val attemptAnswerDao: AttemptAnswerDao,
     private val attemptPackDao: AttemptPackDao,
-    private val currentUserRepository: CurrentUserRepository
+    private val attemptQuestionPlanDao: AttemptQuestionPlanDao,
+    private val currentUserRepository: CurrentUserRepository,
 ) : AttemptRepository {
 
     override fun observeAll(): Flow<List<Attempt>> {
@@ -73,6 +77,14 @@ class AttemptRepositoryImpl(
 
     override suspend fun getActiveStudyAttempt(packId: String): Attempt? {
         return attemptDao.getActiveAttemptForPack(requireCurrentUserId(), packId)?.let { AttemptMapper.toModel(it) }
+    }
+
+    override suspend fun getActiveGameAttempt(packId: String): Attempt? {
+        return attemptDao.getActiveGameAttemptForPack(requireCurrentUserId(), packId)?.let { AttemptMapper.toModel(it) }
+    }
+
+    override suspend fun getQuestionPlan(attemptId: String): List<AttemptQuestionPlan> {
+        return AttemptQuestionPlanMapper.toModelList(attemptQuestionPlanDao.getByAttemptId(attemptId))
     }
 
     override suspend fun getAnswers(attemptId: String): List<AttemptAnswer> {
@@ -236,6 +248,14 @@ class AttemptRepositoryImpl(
         )
         attemptAnswerDao.upsert(AttemptAnswerMapper.toEntity(answer))
         return answer
+    }
+
+    override suspend fun saveQuestionPlan(plan: List<AttemptQuestionPlan>) {
+        attemptQuestionPlanDao.upsertAll(AttemptQuestionPlanMapper.toEntityList(plan))
+    }
+
+    override suspend fun deleteQuestionPlan(attemptId: String) {
+        attemptQuestionPlanDao.deleteByAttemptId(attemptId)
     }
 
     override suspend fun deleteAttempt(attemptId: String) {

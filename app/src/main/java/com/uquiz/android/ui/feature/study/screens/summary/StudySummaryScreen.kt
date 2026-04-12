@@ -38,14 +38,14 @@ import com.uquiz.android.ui.i18n.LocalStrings
  * @param attemptId Identificador del intento finalizado cuyo resumen se muestra.
  * @param attemptRepository Repositorio para leer los datos del intento y sus respuestas.
  * @param packRepository Repositorio para resolver el título del pack asociado.
- * @param onBackToPack Callback invocado al volver al pack, recibe el packId como argumento.
+ * @param onBack Callback invocado al volver atrás en la pila de navegación.
  */
 @Composable
 fun StudySummaryRoute(
     attemptId: String,
     attemptRepository: AttemptRepository,
     packRepository: PackRepository,
-    onBackToPack: (String) -> Unit,
+    onBack: () -> Unit,
 ) {
     val viewModel: StudySummaryViewModel =
         viewModel(
@@ -58,13 +58,11 @@ fun StudySummaryRoute(
         )
     val uiState by viewModel.uiState.collectAsState()
 
-    uiState.packId?.let { packId ->
-        BackHandler { onBackToPack(packId) }
-    }
+    BackHandler(onBack = onBack)
 
     StudySummaryScreen(
         uiState = uiState,
-        onBackToPack = { uiState.packId?.let(onBackToPack) },
+        onBack = onBack,
     )
 }
 
@@ -75,12 +73,12 @@ fun StudySummaryRoute(
  * Incluye métricas de aciertos, fallos, precisión y tiempo efectivo.
  *
  * @param uiState Estado actual con los datos del resumen.
- * @param onBackToPack Callback invocado al pulsar volver al pack.
+ * @param onBack Callback invocado al pulsar volver atrás.
  */
 @Composable
 private fun StudySummaryScreen(
     uiState: StudySummaryUiState,
-    onBackToPack: () -> Unit,
+    onBack: () -> Unit,
 ) {
     val strings = LocalStrings.current
 
@@ -99,7 +97,7 @@ private fun StudySummaryScreen(
                 verticalArrangement = Arrangement.spacedBy(18.dp),
             ) {
                 Text(
-                    text = strings.studySummaryTitle,
+                    text = strings.common.studySummaryTitle,
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.White,
                 )
@@ -115,12 +113,12 @@ private fun StudySummaryScreen(
                 ) {
                     StudyMetricCard(
                         value = uiState.correctAnswers.toString(),
-                        label = strings.studyCorrectAnswersLabel,
+                        label = strings.common.studyCorrectAnswersLabel,
                         modifier = Modifier.weight(1f),
                     )
                     StudyMetricCard(
                         value = uiState.incorrectAnswers.toString(),
-                        label = strings.studyIncorrectAnswersLabel,
+                        label = strings.common.studyIncorrectAnswersLabel,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -130,12 +128,12 @@ private fun StudySummaryScreen(
                 ) {
                     StudyMetricCard(
                         value = "${uiState.accuracyPercent}%",
-                        label = strings.accuracyStatLabel,
+                        label = strings.common.accuracyStatLabel,
                         modifier = Modifier.weight(1f),
                     )
                     StudyMetricCard(
                         value = formatStudyDuration(uiState.effectiveTimeMs),
-                        label = strings.studyEffectiveTimeLabel,
+                        label = strings.common.studyEffectiveTimeLabel,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -143,8 +141,8 @@ private fun StudySummaryScreen(
                 Spacer(Modifier.weight(1f))
 
                 UDarkButton(
-                    text = strings.studyBackToPack,
-                    onClick = onBackToPack,
+                    text = strings.common.back,
+                    onClick = onBack,
                 )
             }
         }
@@ -168,7 +166,7 @@ private fun StudySummaryScreenPreview() {
                     accuracyPercent = 75,
                     effectiveTimeMs = 185_000L,
                 ),
-            onBackToPack = {},
+            onBack = {},
         )
     }
 }

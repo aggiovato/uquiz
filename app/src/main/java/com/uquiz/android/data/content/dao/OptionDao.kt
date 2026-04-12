@@ -7,13 +7,15 @@ import androidx.room.Upsert
 import com.uquiz.android.data.content.entity.OptionEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * ### OptionDao
+ *
+ * Acceso reactivo y puntual a la tabla `options` (opciones de respuesta de las preguntas).
+ */
 @Dao
 interface OptionDao {
 
-    /**
-     * Get all options for a question
-     * Ordered by label (A, B, C, D)
-     */
+    /** Devuelve las opciones de la pregunta ordenadas por etiqueta (A, B, C, D). */
     @Query("""
         SELECT * FROM options
         WHERE questionId = :questionId
@@ -21,9 +23,7 @@ interface OptionDao {
     """)
     suspend fun getByQuestionId(questionId: String): List<OptionEntity>
 
-    /**
-     * Observe options for a question
-     */
+    /** Observa las opciones de la pregunta ordenadas por etiqueta. */
     @Query("""
         SELECT * FROM options
         WHERE questionId = :questionId
@@ -31,15 +31,10 @@ interface OptionDao {
     """)
     fun observeByQuestionId(questionId: String): Flow<List<OptionEntity>>
 
-    /**
-     * Get option by ID
-     */
     @Query("SELECT * FROM options WHERE id = :id")
     suspend fun getById(id: String): OptionEntity?
 
-    /**
-     * Get correct option for a question
-     */
+    /** Devuelve la opción correcta de la pregunta, o `null` si no está definida. */
     @Query("""
         SELECT * FROM options
         WHERE questionId = :questionId AND isCorrect = 1
@@ -47,27 +42,15 @@ interface OptionDao {
     """)
     suspend fun getCorrectOption(questionId: String): OptionEntity?
 
-    /**
-     * Insert or update option
-     */
     @Upsert
     suspend fun upsert(option: OptionEntity)
 
-    /**
-     * Insert or update multiple options
-     */
     @Upsert
     suspend fun upsertAll(options: List<OptionEntity>)
 
-    /**
-     * Delete option
-     */
     @Delete
     suspend fun delete(option: OptionEntity)
 
-    /**
-     * Delete all options for a question
-     */
     @Query("DELETE FROM options WHERE questionId = :questionId")
     suspend fun deleteByQuestionId(questionId: String)
 }

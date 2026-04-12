@@ -6,6 +6,7 @@ import androidx.room.TypeConverters
 import com.uquiz.android.data.attempts.dao.AttemptAnswerDao
 import com.uquiz.android.data.attempts.dao.AttemptDao
 import com.uquiz.android.data.attempts.dao.AttemptPackDao
+import com.uquiz.android.data.attempts.dao.AttemptQuestionPlanDao
 import com.uquiz.android.data.content.dao.FolderDao
 import com.uquiz.android.data.content.dao.OptionDao
 import com.uquiz.android.data.content.dao.PackDao
@@ -18,6 +19,7 @@ import com.uquiz.android.data.user.dao.UserProfileDao
 import com.uquiz.android.data.attempts.entity.AttemptAnswerEntity
 import com.uquiz.android.data.attempts.entity.AttemptEntity
 import com.uquiz.android.data.attempts.entity.AttemptPackEntity
+import com.uquiz.android.data.attempts.entity.AttemptQuestionPlanEntity
 import com.uquiz.android.data.content.entity.FolderEntity
 import com.uquiz.android.data.content.entity.OptionEntity
 import com.uquiz.android.data.content.entity.PackEntity
@@ -28,6 +30,10 @@ import com.uquiz.android.data.content.entity.QuestionEntity
 import com.uquiz.android.data.ranking.entity.UserRankEntity
 import com.uquiz.android.data.user.entity.UserProfileEntity
 
+/**
+ * Base de datos Room de UQuiz. Declara todas las entidades y expone los DAOs de cada slice.
+ * No contiene lógica de negocio; toda la orquestación ocurre en los repositorios.
+ */
 @Database(
     entities = [
         FolderEntity::class,
@@ -38,12 +44,13 @@ import com.uquiz.android.data.user.entity.UserProfileEntity
         AttemptEntity::class,
         AttemptPackEntity::class,
         AttemptAnswerEntity::class,
+        AttemptQuestionPlanEntity::class,
         UserProfileEntity::class,
         QuestionStatsEntity::class,
         PackStatsEntity::class,
         UserRankEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -59,6 +66,7 @@ abstract class UQuizDatabase : RoomDatabase() {
     abstract fun attemptDao(): AttemptDao
     abstract fun attemptPackDao(): AttemptPackDao
     abstract fun attemptAnswerDao(): AttemptAnswerDao
+    abstract fun attemptQuestionPlanDao(): AttemptQuestionPlanDao
     abstract fun userProfileDao(): UserProfileDao
     abstract fun questionStatsDao(): QuestionStatsDao
     abstract fun packStatsDao(): PackStatsDao

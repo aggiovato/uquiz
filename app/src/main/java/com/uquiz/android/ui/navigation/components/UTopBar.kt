@@ -1,7 +1,11 @@
 package com.uquiz.android.ui.navigation.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,17 +48,27 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.uquiz.android.R
 import com.uquiz.android.ui.designsystem.tokens.BrandNavy
 import com.uquiz.android.ui.designsystem.tokens.UIcons
 import com.uquiz.android.ui.designsystem.tokens.URadius
 import com.uquiz.android.ui.i18n.LocalStrings
+import com.uquiz.android.ui.navigation.chrome.NavigationChromeVariant
+import com.uquiz.android.ui.navigation.tree.TopLevelDestination
 
 /**
- * Muestra la barra superior compartida de la aplicación.
+ * ### UTopBar
+ *
+ * Barra superior compartida de la aplicación.
+ *
+ * El hueco izquierdo de 48 dp tiene tres variantes según [topLevelDestination]:
+ * - `null` → flecha de retroceso (navegación no raíz).
+ * - [TopLevelDestination.HOME] → icono monocromático de la app.
+ * - Cualquier otro destino raíz → texto de fecha actual formateado con la localización del app.
  *
  * @param title Título actual de la pantalla.
- * @param canNavigateBack Indica si debe mostrarse la acción de volver atrás.
- * @param onBackClick Se invoca al pulsar el botón de volver.
+ * @param topLevelDestination Destino raíz activo, o `null` si la pantalla no es raíz.
+ * @param onBackClick Se invoca al pulsar el botón de retroceso (solo cuando [topLevelDestination] es `null`).
  * @param selectedLang Código del idioma seleccionado.
  * @param onLangSelect Se invoca al seleccionar un idioma.
  * @param variant Variante visual del chrome de navegación.
@@ -62,7 +77,7 @@ import com.uquiz.android.ui.i18n.LocalStrings
 @Composable
 fun UTopBar(
     title: String,
-    canNavigateBack: Boolean,
+    topLevelDestination: TopLevelDestination?,
     onBackClick: () -> Unit,
     selectedLang: String,
     onLangSelect: (String) -> Unit,
@@ -76,79 +91,107 @@ fun UTopBar(
     val statusBarTop = WindowInsets.statusBars.getTop(density)
     val dropdownOffsetY = statusBarTop + with(density) { (56.dp + 23.dp).roundToPx() }
     val dropdownOffsetX = with(density) { (-5).dp.roundToPx() }
-    val backgroundColor = when (variant) {
-        NavigationChromeVariant.Default -> BrandNavy
-        NavigationChromeVariant.TransparentLight -> Color.Transparent
-    }
-    val contentColor = when (variant) {
-        NavigationChromeVariant.Default -> Color.White
-        NavigationChromeVariant.TransparentLight -> Color.White.copy(alpha = 0.96f)
-    }
-    val animatedBackgroundColor = animateColorAsState(
-        targetValue = backgroundColor,
-        animationSpec = tween(durationMillis = 260),
-        label = "topBarBackground",
-    )
-    val animatedContentColor = animateColorAsState(
-        targetValue = contentColor,
-        animationSpec = tween(durationMillis = 260),
-        label = "topBarContent",
-    )
+    val backgroundColor =
+        when (variant) {
+            NavigationChromeVariant.Default -> BrandNavy
+            NavigationChromeVariant.TransparentLight -> Color.Transparent
+        }
+    val contentColor =
+        when (variant) {
+            NavigationChromeVariant.Default -> Color.White
+            NavigationChromeVariant.TransparentLight -> Color.White.copy(alpha = 0.96f)
+        }
+    val animatedBackgroundColor =
+        animateColorAsState(
+            targetValue = backgroundColor,
+            animationSpec = tween(durationMillis = 260),
+            label = "topBarBackground",
+        )
+    val animatedContentColor =
+        animateColorAsState(
+            targetValue = contentColor,
+            animationSpec = tween(durationMillis = 260),
+            label = "topBarContent",
+        )
 
     Box {
         Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .background(animatedBackgroundColor.value)
-                .statusBarsPadding()
-                .height(50.dp)
-                .padding(end = 8.dp),
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .background(animatedBackgroundColor.value)
+                    .statusBarsPadding()
+                    .height(50.dp)
+                    .padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (canNavigateBack) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = strings.back,
-                        tint = animatedContentColor.value,
+            // Hueco izquierdo fijo de 48 dp: flecha en pantallas de detalle, icono en raíz.
+            Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                if (topLevelDestination == null) {
+                    // Pantalla de detalle: flecha de retroceso estándar.
+                    IconButton(onClick = onBackClick, modifier = Modifier.size(48.dp)) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = strings.common.back,
+                            tint = animatedContentColor.value,
+                        )
+                    }
+                } else {
+                    // Pantalla raíz: icono monocromático de la app.
+                    // Tamaño 40 dp para compensar el padding interno del drawable adaptativo.
+                    Image(
+                        painter = painterResource(R.drawable.ic_launcher_monochrome),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(animatedContentColor.value),
+                        modifier = Modifier.size(40.dp),
                     )
                 }
-            } else {
-                Spacer(Modifier.width(16.dp))
             }
 
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = animatedContentColor.value,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            // AnimatedContent evita el glitch visible cuando el título cambia de forma
+            // asíncrona (p. ej. mientras se resuelve el nombre de la carpeta).
+            AnimatedContent(
+                targetState = title,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(180)) togetherWith fadeOut(animationSpec = tween(120))
+                },
+                label = "topBarTitle",
                 modifier = Modifier.weight(1f),
-            )
+            ) { currentTitle ->
+                Text(
+                    text = currentTitle,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = animatedContentColor.value,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
 
             IconButton(onClick = { }) {
                 Icon(
                     painter = painterResource(UIcons.Actions.LightMode),
-                    contentDescription = strings.toggleTheme,
+                    contentDescription = strings.common.toggleTheme,
                     tint = animatedContentColor.value.copy(alpha = 0.8f),
                     modifier = Modifier.size(20.dp),
                 )
             }
 
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(URadius))
-                    .clickable { showLanguageMenu = !showLanguageMenu }
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                modifier =
+                    Modifier
+                        .clip(RoundedCornerShape(URadius))
+                        .clickable { showLanguageMenu = !showLanguageMenu }
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
                     painter = painterResource(currentLang.flagRes),
                     contentDescription = currentLang.name(strings),
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clip(CircleShape),
+                    modifier =
+                        Modifier
+                            .size(22.dp)
+                            .clip(CircleShape),
                 )
                 Spacer(Modifier.width(5.dp))
                 Text(
@@ -168,30 +211,32 @@ fun UTopBar(
                 properties = PopupProperties(focusable = true),
             ) {
                 Column(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(URadius))
-                        .background(BrandNavy)
-                        .padding(vertical = 4.dp),
+                    modifier =
+                        Modifier
+                            .clip(RoundedCornerShape(URadius))
+                            .background(BrandNavy)
+                            .padding(vertical = 4.dp),
                 ) {
                     uAppLanguages.forEach { lang ->
                         val isSelected = lang.code == selectedLang
                         Row(
-                            modifier = Modifier
-                                .width(172.dp)
-                                .clickable {
-                                    onLangSelect(lang.code)
-                                    showLanguageMenu = false
-                                }
-                                .background(if (isSelected) Color.White.copy(alpha = 0.12f) else Color.Transparent)
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            modifier =
+                                Modifier
+                                    .width(172.dp)
+                                    .clickable {
+                                        onLangSelect(lang.code)
+                                        showLanguageMenu = false
+                                    }.background(if (isSelected) Color.White.copy(alpha = 0.12f) else Color.Transparent)
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Image(
                                 painter = painterResource(lang.flagRes),
                                 contentDescription = lang.name(strings),
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .clip(CircleShape),
+                                modifier =
+                                    Modifier
+                                        .size(24.dp)
+                                        .clip(CircleShape),
                             )
                             Spacer(Modifier.width(12.dp))
                             Text(

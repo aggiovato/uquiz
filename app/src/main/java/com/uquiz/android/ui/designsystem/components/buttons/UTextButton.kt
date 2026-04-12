@@ -50,18 +50,22 @@ fun UTextButton(
     val contentPadding = when (size) {
         UButtonSize.Regular -> PaddingValues(horizontal = 18.dp, vertical = 6.dp)
         UButtonSize.Compact -> PaddingValues(horizontal = 4.dp, vertical = 2.dp)
+        UButtonSize.Tiny -> PaddingValues(horizontal = 4.dp, vertical = 0.dp)
     }
     val minHeight = when (size) {
         UButtonSize.Regular -> 40.dp
         UButtonSize.Compact -> 24.dp
+        UButtonSize.Tiny -> 20.dp
     }
     val textStyle = when (size) {
         UButtonSize.Regular -> MaterialTheme.typography.labelLarge
         UButtonSize.Compact -> MaterialTheme.typography.labelMedium
+        UButtonSize.Tiny -> MaterialTheme.typography.labelSmall
     }
     val iconSize = when (size) {
         UButtonSize.Regular -> 18.dp
         UButtonSize.Compact -> 14.dp
+        UButtonSize.Tiny -> 12.dp
     }
     TextButton(
         onClick = onClick,

@@ -2,16 +2,17 @@ package com.uquiz.android.ui.feature.folder
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import com.uquiz.android.ui.designsystem.components.UEmptyContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,7 +44,6 @@ import com.uquiz.android.ui.designsystem.components.actionsheet.UFabActionItem
 import com.uquiz.android.ui.designsystem.components.feedback.LocalToastController
 import com.uquiz.android.ui.designsystem.components.feedback.UToastTone
 import com.uquiz.android.ui.designsystem.preview.UPreview
-import com.uquiz.android.ui.designsystem.tokens.Neutral400
 import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.feature.folder.components.FolderDialogs
 import com.uquiz.android.ui.feature.folder.model.FolderUiEvent
@@ -247,7 +247,10 @@ private fun FolderScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(strings.nothingHereYet, color = Neutral400)
+                UEmptyContent(
+                    message = strings.common.nothingHereYet,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         } else {
             LazyColumn(
@@ -256,7 +259,7 @@ private fun FolderScreen(
             ) {
                 if (uiState.childFolders.isNotEmpty()) {
                     item {
-                        SectionHeader(strings.subfoldersSection)
+                        SectionHeader(strings.folder.subfoldersSection)
                         Spacer(Modifier.height(8.dp))
                         FolderListCard(
                             folders = uiState.childFolders,
@@ -272,7 +275,7 @@ private fun FolderScreen(
                         if (uiState.childFolders.isNotEmpty()) {
                             Spacer(Modifier.height(24.dp))
                         }
-                        SectionHeader(strings.packsInFolderSection)
+                        SectionHeader(strings.folder.packsInFolderSection)
                         Spacer(Modifier.height(8.dp))
                     }
                     itemsIndexed(uiState.packs, key = { _, item -> item.pack.id }) { index, item ->

@@ -1,0 +1,35 @@
+@startuml use-cases-game-mode
+
+left to right direction
+
+actor "Usuario local" as User
+actor "Storage local" as Storage
+
+rectangle "Game Mode" {
+  usecase "Iniciar game desde pack" as UC_StartGame
+  usecase "Iniciar random game" as UC_RandomGame
+  usecase "Reanudar game activo" as UC_ResumeGame
+  usecase "Construir plan de preguntas" as UC_BuildPlan
+  usecase "Responder bajo tiempo" as UC_AnswerTimed
+  usecase "Calcular score" as UC_Score
+  usecase "Finalizar game y ver summary" as UC_FinishGame
+  usecase "Actualizar ranking y XP" as UC_Rank
+  usecase "Actualizar stats" as UC_GameStats
+}
+
+User --> UC_StartGame
+User --> UC_RandomGame
+User --> UC_ResumeGame
+User --> UC_AnswerTimed
+User --> UC_FinishGame
+Storage --> UC_BuildPlan
+Storage --> UC_Score
+Storage --> UC_Rank
+Storage --> UC_GameStats
+UC_StartGame --> UC_BuildPlan : <<include>>
+UC_RandomGame --> UC_BuildPlan : <<include>>
+UC_AnswerTimed --> UC_Score : <<include>>
+UC_FinishGame --> UC_Rank : <<include>>
+UC_FinishGame --> UC_GameStats : <<include>>
+
+@enduml

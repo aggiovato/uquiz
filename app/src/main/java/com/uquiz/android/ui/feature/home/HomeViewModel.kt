@@ -12,11 +12,22 @@ import com.uquiz.android.domain.ranking.repository.UserRankRepository
 import com.uquiz.android.domain.stats.repository.UserStatsRepository
 import com.uquiz.android.domain.user.repository.UserProfileRepository
 import com.uquiz.android.ui.feature.home.model.ContinuePackUiModel
+import com.uquiz.android.ui.feature.home.model.HomeUiEvent
 import com.uquiz.android.ui.feature.home.model.HomeUiState
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
+/**
+ * ViewModel de la pantalla principal.
+ *
+ * Combina perfil, rango, estadísticas globales y progreso activo por pack para
+ * producir el estado que alimenta el dashboard de inicio.
+ */
 class HomeViewModel(
     userProfileRepository: UserProfileRepository,
     userRankRepository: UserRankRepository,
@@ -24,6 +35,10 @@ class HomeViewModel(
     attemptRepository: AttemptRepository,
     packRepository: PackRepository
 ) : ViewModel() {
+
+    private val events = Channel<HomeUiEvent>(Channel.BUFFERED)
+    val uiEvents = events.receiveAsFlow()
+    private var playablePackIds: List<String> = emptyList()
 
     private val activeProgress = combine(
         attemptRepository.observeActivePackProgress(AttemptMode.GAME),
@@ -41,6 +56,9 @@ class HomeViewModel(
     ) { profile, rank, stats, progress ->
         val (activeGame, activeStudy, packs) = progress
         val packsById = packs.associateBy { it.pack.id }
+        playablePackIds = packs
+            .filter { it.questionCount > 0 }
+            .map { it.pack.id }
         HomeUiState(
             isLoading = false,
             displayName = profile.displayName,
@@ -48,7 +66,10 @@ class HomeViewModel(
             avatarImageUri = profile.avatarImageUri,
             currentRank = rank.currentRank,
             dayStreak = stats.dayStreak,
-            totalPoints = stats.totalPoints.toInt(),
+            score = rank.mmr.toInt(),
+            scoreMmr = rank.mmr,
+            totalXp = rank.totalXp,
+            hasPlayablePacks = playablePackIds.isNotEmpty(),
             continuePlaying = activeGame.asContinuePackModels(packsById),
             continueStudying = activeStudy.asContinuePackModels(packsById)
         )
@@ -58,6 +79,23 @@ class HomeViewModel(
         HomeUiState()
     )
 
+    /** Selecciona un pack jugable al azar y solicita abrir Game mode. */
+    fun onRandomGameRequested() {
+        val packId = playablePackIds.randomOrNull(Random.Default) ?: return
+        viewModelScope.launch {
+            events.send(HomeUiEvent.OpenRandomGamePack(packId))
+        }
+    }
+
+    /** Selecciona un pack jugable al azar y solicita abrir Study mode. */
+    fun onRandomStudyRequested() {
+        val packId = playablePackIds.randomOrNull(Random.Default) ?: return
+        viewModelScope.launch {
+            events.send(HomeUiEvent.OpenRandomStudyPack(packId))
+        }
+    }
+
+    /** Factory que resuelve las dependencias requeridas por [HomeViewModel]. */
     class Factory(
         private val userProfileRepository: UserProfileRepository,
         private val userRankRepository: UserRankRepository,
@@ -81,7 +119,7 @@ class HomeViewModel(
 private fun List<ActivePackProgress>.asContinuePackModels(
     packsById: Map<String, PackWithQuestionCount>
 ): List<ContinuePackUiModel> {
-    return sortedByDescending { it.startedAt }
+    return sortedBy { it.startedAt }
         .filter { it.answeredCount > 0 }
         .distinctBy { it.packId }
         .mapNotNull { progress ->

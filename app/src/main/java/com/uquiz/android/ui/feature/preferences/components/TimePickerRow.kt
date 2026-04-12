@@ -30,22 +30,24 @@ import androidx.compose.ui.unit.dp
 import com.uquiz.android.ui.designsystem.components.buttons.UFilledButton
 import com.uquiz.android.ui.designsystem.components.buttons.UTextButton
 import com.uquiz.android.ui.designsystem.components.dialogs.UDialogScaffold
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.AppRadius
 import com.uquiz.android.ui.designsystem.tokens.BrandNavy
 import com.uquiz.android.ui.designsystem.tokens.Ink950
 import com.uquiz.android.ui.designsystem.tokens.Neutral100
 import com.uquiz.android.ui.designsystem.tokens.Neutral500
 import com.uquiz.android.ui.designsystem.tokens.UIcons
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.i18n.LocalStrings
 
 /**
- * ## TimePickerRow
- * Displays the currently configured reminder time as a tappable chip. Tapping opens
- * a Material3 [TimePicker] dialog. On confirmation the new time is returned via [onConfirm].
+ * ### TimePickerRow
  *
- * @param hour Current hour (0–23).
- * @param minute Current minute (0–59).
- * @param onConfirm Callback invoked with the new (hour, minute) pair on confirmation.
+ * Muestra la hora configurada para el recordatorio y abre un selector al pulsarla.
+ *
+ * @param hour Hora actual en formato 24h.
+ * @param minute Minuto actual.
+ * @param onConfirm Acción invocada al confirmar la nueva hora.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +82,7 @@ fun TimePickerRow(
                     modifier = Modifier.size(18.dp)
                 )
                 Text(
-                    text = strings.reminderTimeLabel,
+                    text = strings.preferences.reminderTimeLabel,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Neutral500
                 )
@@ -102,17 +104,17 @@ fun TimePickerRow(
         )
 
         UDialogScaffold(
-            title = strings.reminderTimePickerTitle,
+            title = strings.preferences.reminderTimePickerTitle,
             onDismiss = { showDialog = false },
             headerColor = BrandNavy,
             headerIconRes = UIcons.Cards.Clock,
             actions = {
                 UTextButton(
-                    text = strings.cancel,
+                    text = strings.common.cancel,
                     onClick = { showDialog = false }
                 )
                 UFilledButton(
-                    text = strings.confirm,
+                    text = strings.preferences.confirm,
                     onClick = {
                         onConfirm(pickerState.hour, pickerState.minute)
                         showDialog = false
@@ -132,5 +134,17 @@ fun TimePickerRow(
                 }
             }
         }
+    }
+}
+
+@UPreview
+@Composable
+private fun TimePickerRowPreview() {
+    UTheme {
+        TimePickerRow(
+            hour = 20,
+            minute = 30,
+            onConfirm = { _, _ -> },
+        )
     }
 }

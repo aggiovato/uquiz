@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
  *
  * Mascota animada del sistema de ranking. Flota y oscila en bucle. Al pulsarla salta
  * y abre la boca con una transición fluida de smile → open que simula una mandíbula.
+ * [UInitiateMascot] corresponde al rank de [com.uquiz.android.domain.ranking.enums.UserRank.INITIATE]
  *
  * @param size Tamaño total del componente.
  */

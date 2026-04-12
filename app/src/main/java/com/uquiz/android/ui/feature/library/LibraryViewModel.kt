@@ -26,6 +26,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel de la pantalla de biblioteca.
+ *
+ * Agrupa el contenido raíz, aplica filtrado local y coordina acciones de creación,
+ * edición, borrado e importación.
+ */
 class LibraryViewModel(
     private val folderRepository: FolderRepository,
     private val packRepository: PackRepository,
@@ -56,7 +62,21 @@ class LibraryViewModel(
             dialogState,
             strings,
         ) { content, query, currentDialog, currentStrings ->
-            val (folders, recentPacks) = content
+            val (folders, allPacks) = content
+
+            // Packs con sesión activa (paused/abandoned), del más antiguo al más reciente.
+            val inProgress = allPacks
+                .filter { it.progress != null }
+                .sortedBy { it.pack.updatedAt }
+
+            // Resto de packs sin actividad, del más nuevo al más antiguo por fecha de creación.
+            val fresh = allPacks
+                .filter { it.progress == null }
+                .sortedByDescending { it.pack.createdAt }
+
+            // Máximo 5 en total: primero los activos, luego los recientes hasta completar 5.
+            val recentPacks = (inProgress + fresh).take(5)
+
             val filteredFolders =
                 if (query.isBlank()) {
                     folders
@@ -77,6 +97,7 @@ class LibraryViewModel(
                 recentPacks = recentPacks,
                 filteredFolders = filteredFolders,
                 filteredPacks = filteredPacks,
+                hasStudiablePacks = recentPacks.any { it.questionCount > 0 },
                 actions =
                     buildLibraryActionItems(
                         strings = currentStrings,
@@ -87,44 +108,65 @@ class LibraryViewModel(
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryUiState())
 
+    /** Actualiza las cadenas activas para reconstruir acciones localizadas del FAB. */
     fun updateStrings(appStrings: AppStrings) {
         strings.value = appStrings
     }
 
+    /** Actualiza la búsqueda local sobre carpetas y packs visibles. */
     fun onSearchQueryChange(query: String) {
         searchQuery.value = query
     }
 
+    /** Abre el diálogo de creación de carpeta raíz. */
     fun onCreateFolderRequested() {
         dialogState.value = LibraryDialogState.CreateFolder
     }
 
+    /** Abre el diálogo de edición para la carpeta indicada. */
     fun onEditFolderRequested(folder: Folder) {
         dialogState.value = LibraryDialogState.EditFolder(folder)
     }
 
+    /** Abre el diálogo de confirmación de borrado de carpeta. */
     fun onDeleteFolderRequested(folder: Folder) {
         dialogState.value = LibraryDialogState.DeleteFolder(folder)
     }
 
+    /** Abre el diálogo de edición para el pack indicado. */
     fun onEditPackRequested(pack: Pack) {
         dialogState.value = LibraryDialogState.EditPack(pack)
     }
 
+    /** Abre el diálogo de confirmación de borrado del pack indicado. */
     fun onDeletePackRequested(pack: Pack) {
         dialogState.value = LibraryDialogState.DeletePack(pack)
     }
 
+    /** Cierra cualquier diálogo visible en la pantalla. */
     fun onDialogDismissed() {
         dialogState.value = LibraryDialogState.None
     }
 
+    /** Selecciona un pack con preguntas al azar y solicita abrir su flujo de estudio. */
+    fun onRandomStudyRequested() {
+        val randomPack = uiState.value.recentPacks
+            .filter { it.questionCount > 0 }
+            .randomOrNull()
+            ?: return
+        viewModelScope.launch {
+            events.send(LibraryUiEvent.OpenRandomStudy(randomPack.pack.id))
+        }
+    }
+
+    /** Solicita a la pantalla abrir el selector de archivos de importación. */
     fun onImportRequested() {
         viewModelScope.launch {
             events.send(LibraryUiEvent.OpenImportPicker)
         }
     }
 
+    /** Crea una carpeta raíz con los valores confirmados en el diálogo. */
     fun onCreateFolderConfirmed(
         name: String,
         colorHex: String,
@@ -141,7 +183,7 @@ class LibraryViewModel(
                 dialogState.value = LibraryDialogState.None
                 events.send(
                     LibraryUiEvent.ShowToast(
-                        message = strings.value.folderCreatedToast,
+                        message = strings.value.common.folderCreatedToast,
                         tone = UToastTone.Success,
                     ),
                 )
@@ -151,6 +193,7 @@ class LibraryViewModel(
         }
     }
 
+    /** Actualiza una carpeta existente con los cambios confirmados por la UI. */
     fun onEditFolderConfirmed(
         folder: Folder,
         name: String,
@@ -169,6 +212,7 @@ class LibraryViewModel(
         }
     }
 
+    /** Elimina la carpeta indicada y emite feedback al usuario. */
     fun onDeleteFolderConfirmed(folder: Folder) {
         viewModelScope.launch {
             try {
@@ -176,7 +220,7 @@ class LibraryViewModel(
                 dialogState.value = LibraryDialogState.None
                 events.send(
                     LibraryUiEvent.ShowToast(
-                        message = strings.value.folderDeletedToast,
+                        message = strings.value.common.folderDeletedToast,
                         tone = UToastTone.Info,
                     ),
                 )
@@ -186,6 +230,7 @@ class LibraryViewModel(
         }
     }
 
+    /** Actualiza los metadatos del pack indicado. */
     fun onEditPackConfirmed(
         pack: Pack,
         title: String,
@@ -210,6 +255,7 @@ class LibraryViewModel(
         }
     }
 
+    /** Elimina el pack indicado y emite feedback al usuario. */
     fun onDeletePackConfirmed(pack: Pack) {
         viewModelScope.launch {
             try {
@@ -217,7 +263,7 @@ class LibraryViewModel(
                 dialogState.value = LibraryDialogState.None
                 events.send(
                     LibraryUiEvent.ShowToast(
-                        message = strings.value.packDeletedToast,
+                        message = strings.value.common.packDeletedToast,
                         tone = UToastTone.Info,
                     ),
                 )
@@ -227,6 +273,7 @@ class LibraryViewModel(
         }
     }
 
+    /** Importa contenido de biblioteca desde un documento ya leído en memoria. */
     fun onImportContentReceived(content: String) {
         viewModelScope.launch {
             try {
@@ -234,7 +281,7 @@ class LibraryViewModel(
                 dialogState.value = LibraryDialogState.None
                 events.send(
                     LibraryUiEvent.ShowToast(
-                        message = strings.value.importUQuizSuccess(result.rootName),
+                        message = strings.value.common.importUQuizSuccess(result.rootName),
                         tone = UToastTone.Success,
                     ),
                 )
@@ -253,6 +300,7 @@ class LibraryViewModel(
         )
     }
 
+    /** Factory que resuelve las dependencias requeridas por [LibraryViewModel]. */
     class Factory(
         private val folderRepository: FolderRepository,
         private val packRepository: PackRepository,

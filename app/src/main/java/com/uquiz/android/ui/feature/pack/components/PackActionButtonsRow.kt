@@ -9,15 +9,27 @@ import androidx.compose.ui.unit.dp
 import com.uquiz.android.ui.designsystem.components.buttons.UFilledButton
 import com.uquiz.android.ui.designsystem.components.buttons.UButtonSize
 import com.uquiz.android.ui.designsystem.components.buttons.UOutlinedButton
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.UIcons
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.i18n.LocalStrings
 
+/**
+ * ### PackActionButtonsRow
+ *
+ * Fila principal de acciones para iniciar estudio o juego desde un pack.
+ *
+ * @param canStartStudy Indica si el botón de estudio debe estar habilitado.
+ * @param canStartGame Indica si el botón de juego debe estar habilitado.
+ * @param onStudyClick Acción para entrar al modo estudio.
+ * @param onGameClick Acción para entrar al modo juego.
+ */
 @Composable
 fun PackActionButtonsRow(
     canStartStudy: Boolean,
     canStartGame: Boolean,
     onStudyClick: () -> Unit,
-    onQuickGameClick: () -> Unit,
+    onGameClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val strings = LocalStrings.current
@@ -27,7 +39,7 @@ fun PackActionButtonsRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         UFilledButton(
-            text = strings.studyAction,
+            text = strings.common.studyAction,
             onClick = onStudyClick,
             enabled = canStartStudy,
             leadingIconRes = UIcons.Actions.Study,
@@ -35,12 +47,25 @@ fun PackActionButtonsRow(
             modifier = Modifier.weight(1f)
         )
         UOutlinedButton(
-            text = strings.playMode,
-            onClick = onQuickGameClick,
+            text = strings.common.playMode,
+            onClick = onGameClick,
             enabled = canStartGame,
             leadingIconRes = UIcons.Actions.Play,
             size = UButtonSize.Compact,
             modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@UPreview
+@Composable
+private fun PackActionButtonsRowPreview() {
+    UTheme {
+        PackActionButtonsRow(
+            canStartStudy = true,
+            canStartGame = true,
+            onStudyClick = {},
+            onGameClick = {},
         )
     }
 }

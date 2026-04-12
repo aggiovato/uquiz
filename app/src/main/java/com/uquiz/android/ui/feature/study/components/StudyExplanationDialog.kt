@@ -34,7 +34,7 @@ fun StudyExplanationDialog(
 ) {
     val strings = LocalStrings.current
     UDialogScaffold(
-        title = strings.studyExplanationLabel,
+        title = strings.studySession.studyExplanationLabel,
         onDismiss = onDismiss,
         headerColor = BrandNavy,
         headerIconRes = UIcons.Select.Idea,
@@ -48,7 +48,7 @@ fun StudyExplanationDialog(
                         .fillMaxWidth(),
             ) {
                 UFilledButton(
-                    text = strings.cancel,
+                    text = strings.common.cancel,
                     onClick = onDismiss,
                     tone = UButtonTone.Brand,
                     modifier = Modifier.fillMaxWidth(),

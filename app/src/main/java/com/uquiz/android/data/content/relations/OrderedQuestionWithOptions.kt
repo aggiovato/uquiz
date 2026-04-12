@@ -5,6 +5,7 @@ import androidx.room.Relation
 import com.uquiz.android.data.content.entity.OptionEntity
 import com.uquiz.android.data.content.entity.QuestionEntity
 
+/** Relación Room: pregunta con sus opciones, enriquecida con la posición [position] dentro del pack. */
 data class OrderedQuestionWithOptions(
     val position: Int,
     @Embedded

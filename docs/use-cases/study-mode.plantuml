@@ -1,0 +1,30 @@
+@startuml use-cases-study-mode
+
+left to right direction
+
+actor "Usuario local" as User
+actor "Storage local" as Storage
+
+rectangle "Study Mode" {
+  usecase "Iniciar study desde pack" as UC_StartStudy
+  usecase "Iniciar study aleatorio" as UC_RandomStudy
+  usecase "Reanudar study activo" as UC_ResumeStudy
+  usecase "Responder pregunta" as UC_AnswerStudy
+  usecase "Leer explicacion" as UC_Explanation
+  usecase "Finalizar study y ver summary" as UC_FinishStudy
+  usecase "Actualizar stats por pregunta y pack" as UC_StudyAnalytics
+}
+
+User --> UC_StartStudy
+User --> UC_RandomStudy
+User --> UC_ResumeStudy
+User --> UC_AnswerStudy
+User --> UC_Explanation
+User --> UC_FinishStudy
+Storage --> UC_StartStudy
+Storage --> UC_RandomStudy
+Storage --> UC_ResumeStudy
+Storage --> UC_StudyAnalytics
+UC_FinishStudy --> UC_StudyAnalytics : <<include>>
+
+@enduml

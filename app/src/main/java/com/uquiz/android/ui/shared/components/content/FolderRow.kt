@@ -60,8 +60,8 @@ fun FolderRow(
     }
     val strings = LocalStrings.current
     val subtitleParts = buildList {
-        if (subfolderCount > 0) add(strings.subfoldersLabel(subfolderCount))
-        if (packCount > 0) add(strings.packsLabel(packCount))
+        if (subfolderCount > 0) add(strings.common.subfoldersLabel(subfolderCount))
+        if (packCount > 0) add(strings.common.packsLabel(packCount))
     }
 
     Row(
@@ -98,7 +98,7 @@ fun FolderRow(
         Row(verticalAlignment = Alignment.CenterVertically) {
             UIconActionButton(
                 iconRes = UIcons.Actions.Edit,
-                contentDescription = strings.editFolder,
+                contentDescription = strings.common.editFolder,
                 onClick = onEditClick,
                 tone = UButtonTone.Brand,
                 elevated = false,
@@ -106,7 +106,7 @@ fun FolderRow(
             Spacer(Modifier.width(8.dp))
             UIconActionButton(
                 iconRes = UIcons.Actions.Delete,
-                contentDescription = strings.deleteFolder,
+                contentDescription = strings.common.deleteFolder,
                 onClick = onDeleteClick,
                 tone = UButtonTone.Danger,
                 elevated = false,

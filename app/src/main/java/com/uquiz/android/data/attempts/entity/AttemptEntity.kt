@@ -3,10 +3,16 @@ package com.uquiz.android.data.attempts.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.uquiz.android.data.local.db.AuditTimestamps
+import com.uquiz.android.data.local.db.model.AuditTimestamps
 import com.uquiz.android.domain.attempts.enums.AttemptMode
 import com.uquiz.android.domain.attempts.enums.AttemptStatus
 
+/**
+ * Fila de la tabla `attempts`. Representa una sesión de intento del usuario (estudio o partida).
+ * El campo [primaryPackId] puede ser nulo cuando el intento agrupa varios packs simultáneamente.
+ *
+ * @see com.uquiz.android.domain.attempts.model.Attempt
+ */
 @Entity(tableName = "attempts")
 data class AttemptEntity(
     @PrimaryKey
@@ -23,5 +29,5 @@ data class AttemptEntity(
     val correctAnswers: Int = 0,
     val currentQuestionIndex: Int = 0,
     @Embedded
-    val audit: AuditTimestamps = AuditTimestamps()
+    val audit: AuditTimestamps = AuditTimestamps(),
 )

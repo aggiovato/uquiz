@@ -1,5 +1,8 @@
 package com.uquiz.android.domain.stats.repository
 
+import com.uquiz.android.domain.stats.enums.UserStatsModeFilter
+import com.uquiz.android.domain.stats.enums.UserStatsPeriodFilter
+import com.uquiz.android.domain.stats.projection.UserStatsDashboard
 import com.uquiz.android.domain.stats.projection.UserStatsSnapshot
 import kotlinx.coroutines.flow.Flow
 
@@ -24,6 +27,12 @@ interface UserStatsRepository {
      * ### Reactive reads
      *
      * - observeSnapshot()
+     * - observeDashboard(modeFilter, periodFilter)
      */
     fun observeSnapshot(): Flow<UserStatsSnapshot>
+
+    fun observeDashboard(
+        modeFilter: UserStatsModeFilter,
+        periodFilter: UserStatsPeriodFilter,
+    ): Flow<UserStatsDashboard>
 }

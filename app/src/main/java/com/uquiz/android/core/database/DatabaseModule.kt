@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.uquiz.android.data.local.db.UQuizDatabase
 import com.uquiz.android.data.local.db.migrations.MIGRATION_10_11
+import com.uquiz.android.data.local.db.migrations.MIGRATION_11_12
 import com.uquiz.android.data.local.db.migrations.MIGRATION_1_2
 import com.uquiz.android.data.local.db.seeders.DatabaseSeeder
 
@@ -32,6 +33,7 @@ object DatabaseModule {
     fun getDatabase(
         context: Context,
         enableSeeding: Boolean = true,
+        allowDestructiveMigration: Boolean = false,
     ): UQuizDatabase =
         INSTANCE ?: synchronized(this) {
             val builder =
@@ -40,9 +42,13 @@ object DatabaseModule {
                         context.applicationContext,
                         UQuizDatabase::class.java,
                         "uquiz_database",
-                    ).addMigrations(MIGRATION_1_2, MIGRATION_10_11)
-                    // Fallback destructive for development (change to false in production)
-                    .fallbackToDestructiveMigration()
+                    ).addMigrations(MIGRATION_1_2, MIGRATION_10_11, MIGRATION_11_12)
+
+            // Activar solo en desarrollo: borra y recrea la DB si una migración falla.
+            // En release debe ser false para no borrar datos del usuario silenciosamente.
+            if (allowDestructiveMigration) {
+                builder.fallbackToDestructiveMigration(false)
+            }
 
             if (enableSeeding) {
                 builder.addCallback(seedCallback)

@@ -29,6 +29,7 @@ import com.uquiz.android.domain.stats.projection.PackDetailedStats
 import com.uquiz.android.ui.designsystem.components.buttons.UButtonSize
 import com.uquiz.android.ui.designsystem.components.buttons.UOutlinedButton
 import com.uquiz.android.ui.designsystem.components.buttons.UPlainIconButton
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.BrandNavy
 import com.uquiz.android.ui.designsystem.tokens.Ink950
 import com.uquiz.android.ui.designsystem.tokens.Navy400
@@ -39,6 +40,7 @@ import com.uquiz.android.ui.designsystem.tokens.Orange700
 import com.uquiz.android.ui.designsystem.tokens.Teal700
 import com.uquiz.android.ui.designsystem.tokens.URadius
 import com.uquiz.android.ui.designsystem.tokens.UIcons
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.i18n.AppStrings
 import com.uquiz.android.ui.i18n.LocalStrings
 import java.text.SimpleDateFormat
@@ -46,6 +48,15 @@ import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * ### PackStatsBottomSheet
+ *
+ * Bottom sheet con el resumen rápido de estadísticas de un pack.
+ *
+ * @param stats Métricas detalladas del pack que alimentan el resumen.
+ * @param onSeeFullStatsClick Acción para navegar al detalle completo.
+ * @param onDismiss Acción para cerrar el bottom sheet.
+ */
 @Composable
 fun PackStatsBottomSheet(
     stats: PackDetailedStats,
@@ -88,7 +99,7 @@ fun PackStatsBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = strings.packStatsTitle,
+                    text = strings.statsPack.packStatsTitle,
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
@@ -96,7 +107,7 @@ fun PackStatsBottomSheet(
                 )
                 UPlainIconButton(
                     iconRes = UIcons.Actions.Close,
-                    contentDescription = strings.cancel,
+                    contentDescription = strings.common.cancel,
                     onClick = onDismiss,
                     tint = Navy400,
                     hitSize = 22.dp,
@@ -112,14 +123,14 @@ fun PackStatsBottomSheet(
                     iconRes = UIcons.Cards.Session,
                     iconTint = Navy500,
                     value = stats.totalSessions.toString(),
-                    label = strings.sessionsStatLabel,
+                    label = strings.common.sessionsStatLabel,
                     modifier = Modifier.weight(1f)
                 )
                 SummaryMiniStat(
                     iconRes = UIcons.Cards.Check,
                     iconTint = Teal700,
                     value = stats.averageAccuracyPercent?.let { "$it%" } ?: "--",
-                    label = strings.accuracyStatLabel,
+                    label = strings.common.accuracyStatLabel,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -132,29 +143,29 @@ fun PackStatsBottomSheet(
                     iconRes = UIcons.Cards.Clock,
                     iconTint = Navy500,
                     value = stats.averageDurationMs?.toReadableDuration() ?: "--",
-                    label = strings.averageTimeStatLabel,
+                    label = strings.common.averageTimeStatLabel,
                     modifier = Modifier.weight(1f)
                 )
                 SummaryMiniStat(
                     iconRes = UIcons.Cards.Progress,
                     iconTint = Orange700,
                     value = "${stats.progressPercent}%",
-                    label = strings.progressLabel,
+                    label = strings.common.progressLabel,
                     modifier = Modifier.weight(1f)
                 )
             }
 
             MetadataRow(
-                label = strings.packLastSessionLabel,
-                value = stats.lastSessionAt?.formatAsSessionTime() ?: strings.packNoSessionsYet
+                label = strings.statsPack.packLastSessionLabel,
+                value = stats.lastSessionAt?.formatAsSessionTime() ?: strings.statsPack.packNoSessionsYet
             )
             MetadataRow(
-                label = strings.packMostUsedModeLabel,
+                label = strings.statsPack.packMostUsedModeLabel,
                 value = stats.mostUsedMode.asModeLabel(strings)
             )
 
             UOutlinedButton(
-                text = strings.packSeeFullStats,
+                text = strings.statsPack.packSeeFullStats,
                 onClick = onSeeFullStatsClick,
                 leadingIconRes = UIcons.Actions.Details,
                 modifier = Modifier.fillMaxWidth(),
@@ -221,8 +232,31 @@ private fun Long.toReadableDuration(): String {
     return if (minutes > 0) "${minutes}m ${seconds}s" else "${seconds}s"
 }
 
+@UPreview
+@Composable
+private fun PackStatsBottomSheetPreview() {
+    UTheme {
+        PackStatsBottomSheet(
+            stats = PackDetailedStats(
+                packId = "pack-1",
+                totalSessions = 8,
+                averageAccuracyPercent = 72,
+                averageDurationMs = 320_000L,
+                progressPercent = 50,
+                dominatedQuestions = 12,
+                totalQuestions = 24,
+                lastSessionAt = 1_700_000_000_000L,
+                lastSessionMode = AttemptMode.STUDY,
+                mostUsedMode = AttemptMode.STUDY,
+            ),
+            onSeeFullStatsClick = {},
+            onDismiss = {},
+        )
+    }
+}
+
 private fun AttemptMode?.asModeLabel(strings: AppStrings): String = when (this) {
-    AttemptMode.STUDY -> strings.studyMode
-    AttemptMode.GAME -> strings.playMode
-    null -> strings.packNoSessionsYet
+    AttemptMode.STUDY -> strings.common.studyMode
+    AttemptMode.GAME -> strings.common.playMode
+    null -> strings.statsPack.packNoSessionsYet
 }

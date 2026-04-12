@@ -17,8 +17,8 @@ fun buildLibraryActionItems(
     listOf(
         UFabActionItem(
             id = "create_root_folder",
-            label = strings.newFolder,
-            description = strings.createFolderActionDescription,
+            label = strings.common.newFolder,
+            description = strings.common.createFolderActionDescription,
             iconRes = UIcons.Content.Folder.Add,
             containerColor = Navy500,
             contentColor = Color.White,
@@ -26,8 +26,8 @@ fun buildLibraryActionItems(
         ),
         UFabActionItem(
             id = "import_uquiz",
-            label = strings.importUQuizAction,
-            description = strings.importUQuizActionDescription,
+            label = strings.common.importUQuizAction,
+            description = strings.common.importUQuizActionDescription,
             iconRes = UIcons.Actions.Upload,
             containerColor = Teal700,
             contentColor = Color.White,
@@ -48,8 +48,8 @@ fun buildFolderActionItems(
     listOf(
         UFabActionItem(
             id = "create_pack",
-            label = strings.newPack,
-            description = strings.createPackActionDescription,
+            label = strings.common.newPack,
+            description = strings.common.createPackActionDescription,
             iconRes = UIcons.Content.Pack.Add,
             containerColor = Navy500,
             contentColor = Color.White,
@@ -57,8 +57,8 @@ fun buildFolderActionItems(
         ),
         UFabActionItem(
             id = "create_subfolder",
-            label = strings.newFolder,
-            description = strings.createFolderActionDescription,
+            label = strings.common.newFolder,
+            description = strings.common.createFolderActionDescription,
             iconRes = UIcons.Content.Folder.Add,
             containerColor = Navy500,
             contentColor = Color.White,
@@ -66,8 +66,8 @@ fun buildFolderActionItems(
         ),
         UFabActionItem(
             id = "import_uquiz",
-            label = strings.importUQuizAction,
-            description = strings.importUQuizActionDescription,
+            label = strings.common.importUQuizAction,
+            description = strings.common.importUQuizActionDescription,
             iconRes = UIcons.Actions.Upload,
             containerColor = Teal700,
             contentColor = Color.White,
@@ -75,8 +75,8 @@ fun buildFolderActionItems(
         ),
         UFabActionItem(
             id = "export_subtree",
-            label = strings.exportUQuizAction,
-            description = strings.exportUQuizActionDescription,
+            label = strings.common.exportUQuizAction,
+            description = strings.common.exportUQuizActionDescription,
             iconRes = UIcons.Actions.Download,
             containerColor = Teal700,
             contentColor = Color.White,
@@ -85,8 +85,8 @@ fun buildFolderActionItems(
         ),
         UFabActionItem(
             id = "delete_folder",
-            label = strings.deleteFolder,
-            description = strings.deleteFolderActionDescription,
+            label = strings.common.deleteFolder,
+            description = strings.common.deleteFolderActionDescription,
             iconRes = UIcons.Actions.Delete,
             kind = UFabActionKind.Destructive,
             enabled = canDeleteCurrent,

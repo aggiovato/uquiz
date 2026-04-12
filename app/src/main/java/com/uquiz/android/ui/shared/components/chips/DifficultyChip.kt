@@ -97,10 +97,10 @@ fun DifficultyChip(
 
     Text(
         text = when (difficulty) {
-            DifficultyLevel.EASY -> strings.difficultyEasy
-            DifficultyLevel.MEDIUM -> strings.difficultyMedium
-            DifficultyLevel.HARD -> strings.difficultyHard
-            DifficultyLevel.EXPERT -> strings.difficultyExpert
+            DifficultyLevel.EASY -> strings.common.difficultyEasy
+            DifficultyLevel.MEDIUM -> strings.common.difficultyMedium
+            DifficultyLevel.HARD -> strings.common.difficultyHard
+            DifficultyLevel.EXPERT -> strings.common.difficultyExpert
         },
         style = MaterialTheme.typography.labelSmall,
         color = contentColor,

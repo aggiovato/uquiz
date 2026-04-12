@@ -6,9 +6,15 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.uquiz.android.data.content.entity.PackEntity
-import com.uquiz.android.data.local.db.AuditTimestamps
+import com.uquiz.android.data.local.db.model.AuditTimestamps
 import com.uquiz.android.domain.attempts.enums.AttemptMode
 
+/**
+ * Fila de la tabla `pack_stats`. Acumula estadísticas históricas de un usuario para un pack concreto:
+ * sesiones totales, precisión media, mejor puntuación, progreso de mastery y más.
+ *
+ * @see com.uquiz.android.domain.stats.model.PackStats
+ */
 @Entity(
     tableName = "pack_stats",
     foreignKeys = [
@@ -16,10 +22,10 @@ import com.uquiz.android.domain.attempts.enums.AttemptMode
             entity = PackEntity::class,
             parentColumns = ["id"],
             childColumns = ["packId"],
-            onDelete = ForeignKey.CASCADE
-        )
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
-    indices = [Index("userId"), Index("packId")]
+    indices = [Index("userId"), Index("packId")],
 )
 data class PackStatsEntity(
     @PrimaryKey
@@ -45,5 +51,5 @@ data class PackStatsEntity(
     val totalQuestionsSnapshot: Int = 0,
     val progressPercent: Int = 0,
     @Embedded
-    val audit: AuditTimestamps = AuditTimestamps()
+    val audit: AuditTimestamps = AuditTimestamps(),
 )

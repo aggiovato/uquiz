@@ -7,9 +7,15 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.uquiz.android.data.content.entity.PackEntity
 import com.uquiz.android.data.content.entity.QuestionEntity
-import com.uquiz.android.data.local.db.AuditTimestamps
+import com.uquiz.android.data.local.db.model.AuditTimestamps
 import com.uquiz.android.domain.stats.enums.QuestionMasteryLevel
 
+/**
+ * Fila de la tabla `question_stats`. Acumula el rendimiento del usuario en una pregunta específica
+ * dentro de un pack: intentos, aciertos, rachas y nivel de mastery calculado.
+ *
+ * @see com.uquiz.android.domain.stats.model.QuestionStats
+ */
 @Entity(
     tableName = "question_stats",
     foreignKeys = [
@@ -17,16 +23,16 @@ import com.uquiz.android.domain.stats.enums.QuestionMasteryLevel
             entity = QuestionEntity::class,
             parentColumns = ["id"],
             childColumns = ["questionId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = PackEntity::class,
             parentColumns = ["id"],
             childColumns = ["packId"],
-            onDelete = ForeignKey.CASCADE
-        )
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
-    indices = [Index("userId"), Index("questionId"), Index("packId")]
+    indices = [Index("userId"), Index("questionId"), Index("packId")],
 )
 data class QuestionStatsEntity(
     @PrimaryKey
@@ -50,5 +56,5 @@ data class QuestionStatsEntity(
     val masteryLevel: QuestionMasteryLevel = QuestionMasteryLevel.NEW,
     val lastAnsweredAt: Long? = null,
     @Embedded
-    val audit: AuditTimestamps = AuditTimestamps()
+    val audit: AuditTimestamps = AuditTimestamps(),
 )

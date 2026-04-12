@@ -9,17 +9,23 @@ import com.uquiz.android.domain.attempts.enums.AttemptMode
 import com.uquiz.android.domain.attempts.enums.AttemptStatus
 import com.uquiz.android.data.attempts.relations.AttemptWithAnswers
 import com.uquiz.android.data.attempts.relations.AttemptWithPacks
-import com.uquiz.android.data.stats.dao.PackPracticeStatsProjection
-import com.uquiz.android.data.stats.dao.PackAggregateStatsProjection
-import com.uquiz.android.data.stats.dao.PackRecentActivityProjection
+import com.uquiz.android.data.attempts.query.ActivePackProgressRow
+import com.uquiz.android.data.attempts.query.UserPackStatsQueryRow
+import com.uquiz.android.data.stats.query.PackAggregateStatsRow
+import com.uquiz.android.data.stats.query.PackPracticeStatsRow
+import com.uquiz.android.data.stats.query.PackRecentActivityRow
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * ### AttemptDao
+ *
+ * Acceso reactivo y puntual a la tabla `attempts` y sus estadísticas derivadas.
+ * Las queries de agregación producen rows tipados definidos en `query/` y en `data/stats/query/`.
+ */
 @Dao
 interface AttemptDao {
 
-    /**
-     * Observe all attempts ordered by date (newest first)
-     */
+    /** Observa todos los intentos del usuario ordenados por fecha de inicio (más reciente primero). */
     @Query("""
         SELECT * FROM attempts
         WHERE userId = :userId
@@ -27,9 +33,7 @@ interface AttemptDao {
     """)
     fun observeAll(userId: String): Flow<List<AttemptEntity>>
 
-    /**
-     * Observe attempts by mode
-     */
+    /** Observa los intentos del usuario filtrados por [mode], ordenados por fecha de inicio. */
     @Query("""
         SELECT * FROM attempts
         WHERE userId = :userId
@@ -38,21 +42,13 @@ interface AttemptDao {
     """)
     fun observeByMode(userId: String, mode: AttemptMode): Flow<List<AttemptEntity>>
 
-    /**
-     * Get attempt by ID
-     */
     @Query("SELECT * FROM attempts WHERE id = :id")
     suspend fun getById(id: String): AttemptEntity?
 
-    /**
-     * Observe attempt by ID
-     */
     @Query("SELECT * FROM attempts WHERE id = :id")
     fun observeById(id: String): Flow<AttemptEntity?>
 
-    /**
-     * Get incomplete attempts (completedAt is null)
-     */
+    /** Devuelve los intentos activos (estado [AttemptStatus.IN_PROGRESS]) del usuario. */
     @Query("""
         SELECT * FROM attempts
         WHERE userId = :userId
@@ -81,8 +77,24 @@ interface AttemptDao {
     ): AttemptEntity?
 
     /**
-     * Get completed attempts
+     * Devuelve el intento de Game mode activo para un pack, o null si no existe.
      */
+    @Query("""
+        SELECT * FROM attempts
+        WHERE userId = :userId
+          AND mode = :mode
+          AND primaryPackId = :packId
+          AND status = :status
+        ORDER BY startedAt DESC
+        LIMIT 1
+    """)
+    suspend fun getActiveGameAttemptForPack(
+        userId: String,
+        packId: String,
+        mode: AttemptMode = AttemptMode.GAME,
+        status: AttemptStatus = AttemptStatus.IN_PROGRESS
+    ): AttemptEntity?
+
     @Query("""
         SELECT * FROM attempts
         WHERE userId = :userId
@@ -96,23 +108,48 @@ interface AttemptDao {
         status: AttemptStatus = AttemptStatus.COMPLETED
     ): List<AttemptEntity>
 
-    /**
-     * Get average score for a mode
-     */
     @Query("""
         SELECT AVG(score) FROM attempts
         WHERE userId = :userId AND mode = :mode AND completedAt IS NOT NULL
     """)
     suspend fun getAverageScore(userId: String, mode: AttemptMode): Double?
 
-    /**
-     * Get best score for a mode
-     */
     @Query("""
         SELECT MAX(score) FROM attempts
         WHERE userId = :userId AND mode = :mode AND completedAt IS NOT NULL
     """)
     suspend fun getBestScore(userId: String, mode: AttemptMode): Int?
+
+    @Query("""
+        SELECT
+            p.id AS packId,
+            p.title AS title,
+            COUNT(a.id) AS sessions,
+            CASE
+                WHEN SUM(a.totalQuestions) > 0
+                    THEN CAST(ROUND((SUM(a.correctAnswers) * 100.0) / SUM(a.totalQuestions)) AS INTEGER)
+                ELSE NULL
+            END AS accuracyPercent,
+            CAST(AVG(a.durationMs) AS INTEGER) AS averageDurationMs,
+            COALESCE(ps.progressPercent, 0) AS progressPercent
+        FROM attempts a
+        JOIN packs p ON p.id = a.primaryPackId
+        LEFT JOIN pack_stats ps ON ps.userId = a.userId AND ps.packId = p.id
+        WHERE a.userId = :userId
+          AND a.status = 'COMPLETED'
+          AND a.primaryPackId IS NOT NULL
+          AND (:mode IS NULL OR a.mode = :mode)
+          AND (:startedAfter IS NULL OR a.completedAt >= :startedAfter)
+        GROUP BY p.id
+        ORDER BY sessions DESC, accuracyPercent DESC
+        LIMIT :limit
+    """)
+    suspend fun getUserPackStatsRows(
+        userId: String,
+        mode: AttemptMode?,
+        startedAfter: Long?,
+        limit: Int = 8
+    ): List<UserPackStatsQueryRow>
 
     @Query("""
         SELECT
@@ -132,7 +169,7 @@ interface AttemptDao {
         userId: String,
         packId: String,
         mode: AttemptMode = AttemptMode.STUDY
-    ): Flow<PackPracticeStatsProjection>
+    ): Flow<PackPracticeStatsRow>
 
     @Query("""
         SELECT
@@ -163,7 +200,7 @@ interface AttemptDao {
     fun observePackAggregateStats(
         userId: String,
         packId: String
-    ): Flow<PackAggregateStatsProjection?>
+    ): Flow<PackAggregateStatsRow?>
 
     @Query("""
         SELECT
@@ -185,7 +222,7 @@ interface AttemptDao {
         userId: String,
         packId: String,
         limit: Int = 10
-    ): Flow<List<PackRecentActivityProjection>>
+    ): Flow<List<PackRecentActivityRow>>
 
     @Query("""
         SELECT
@@ -216,7 +253,7 @@ interface AttemptDao {
     suspend fun getPackAggregateStats(
         userId: String,
         packId: String
-    ): PackAggregateStatsProjection?
+    ): PackAggregateStatsRow?
 
     @Query("""
         SELECT
@@ -238,46 +275,30 @@ interface AttemptDao {
         userId: String,
         mode: AttemptMode = AttemptMode.STUDY,
         status: AttemptStatus = AttemptStatus.IN_PROGRESS
-    ): Flow<List<ActivePackProgressProjection>>
+    ): Flow<List<ActivePackProgressRow>>
 
-    /**
-     * Insert or update attempt
-     */
     @Upsert
     suspend fun upsert(attempt: AttemptEntity)
 
-    /**
-     * Delete attempt (will cascade to answers)
-     */
+    /** Elimina el intento por ID en cascada (respuestas incluidas). */
     @Query("DELETE FROM attempts WHERE id = :id")
     suspend fun deleteById(id: String)
 
-    /**
-     * Delete old attempts
-     */
+    /** Elimina todos los intentos anteriores a [beforeTimestamp]. Útil para limpiar histórico antiguo. */
     @Query("""
         DELETE FROM attempts
         WHERE startedAt < :beforeTimestamp
     """)
     suspend fun deleteOlderThan(beforeTimestamp: Long)
 
-    /**
-     * Get attempt with all answers
-     */
     @Transaction
     @Query("SELECT * FROM attempts WHERE id = :attemptId")
     suspend fun getAttemptWithAnswers(attemptId: String): AttemptWithAnswers?
 
-    /**
-     * Observe attempt with answers
-     */
     @Transaction
     @Query("SELECT * FROM attempts WHERE id = :attemptId")
     fun observeAttemptWithAnswers(attemptId: String): Flow<AttemptWithAnswers?>
 
-    /**
-     * Get attempt with packs used
-     */
     @Transaction
     @Query("SELECT * FROM attempts WHERE id = :attemptId")
     suspend fun getAttemptWithPacks(attemptId: String): AttemptWithPacks?

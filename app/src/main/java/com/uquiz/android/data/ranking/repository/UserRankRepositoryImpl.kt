@@ -11,6 +11,11 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
+/**
+ * Implementación de [UserRankRepository]. Combina [UserRankDao] con [CurrentUserRepository]
+ * para reactive reads con filtro por usuario activo. Cuando no existe fila en `user_rank`,
+ * devuelve un estado por defecto con MMR inicial en lugar de propagar `null`.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserRankRepositoryImpl(
     private val userRankDao: UserRankDao,

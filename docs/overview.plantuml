@@ -39,6 +39,10 @@ package "attempts" #E0F9F4 {
     entity "attempt_packs" as AttemptPack <<join-attempts>> {
         PK(attemptId, packId)
     }
+    entity "attempt_question_plan" as AttemptPlan <<attempts>> {
+        PK(attemptId, questionId)
+        orderIndex, timeLimitMs
+    }
 }
 
 package "stats" #FFF3D6 {
@@ -65,6 +69,9 @@ package "user" #ECF0F1 {
         id, displayName
         avatarIcon, avatarImageUri
     }
+    entity "CurrentUserSelection\n(DataStore)" as UCurrent <<datastore>> {
+        current_user_id
+    }
     entity "UserPreferences\n(DataStore)" as UPrefs <<datastore>> {
         languageCode, themeMode
         practiceReminder*
@@ -77,6 +84,8 @@ Question    ||--|{  Option          : "tiene"
 
 Attempt     ||--|{  AttemptAnswer   : "respuestas"
 Attempt     }o--o{  Pack            : "attempt_packs"
+AttemptPlan ..>     Attempt         : "plan del intento"
+AttemptPlan ..>     Question        : "questionId"
 AttemptAnswer }o--|| Question       : "ref"
 AttemptAnswer }o--o| Option         : "pickedOption"
 
@@ -85,7 +94,8 @@ QStats      }o--||  Pack            : "en pack"
 PStats      }o--||  Pack            : "stats de"
 
 UProfile    ||--||  URank           : "1:1 userId"
-UProfile    ..>     UPrefs          : "mismo userId"
+UCurrent    ..>     UProfile        : "usuario activo"
+UCurrent    ..>     UPrefs          : "scope de preferencias"
 
 Attempt     ..>     UProfile        : "userId (sin FK)"
 QStats      ..>     UProfile        : "userId (sin FK)"

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.uquiz.android.domain.stats.projection.PackOverviewMetrics
 import com.uquiz.android.ui.designsystem.components.buttons.UIconActionButton
 import com.uquiz.android.ui.designsystem.components.buttons.UPlainIconButton
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.Gold500
 import com.uquiz.android.ui.designsystem.tokens.Navy400
 import com.uquiz.android.ui.designsystem.tokens.Navy700
@@ -45,8 +46,20 @@ import com.uquiz.android.ui.designsystem.tokens.Orange700
 import com.uquiz.android.ui.designsystem.tokens.Teal700
 import com.uquiz.android.ui.designsystem.tokens.UIcons
 import com.uquiz.android.ui.designsystem.tokens.URadius
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.i18n.LocalStrings
 
+/**
+ * ### PackOverviewCard
+ *
+ * Tarjeta superior del detalle de pack con metadatos, acciones y métricas resumidas.
+ *
+ * @param title Título visible del pack.
+ * @param description Descripción opcional del pack.
+ * @param overview Métricas resumidas mostradas en la zona inferior.
+ * @param onEditClick Acción para editar el pack.
+ * @param onStatsClick Acción para abrir el resumen de estadísticas.
+ */
 @Composable
 fun PackOverviewCard(
     title: String,
@@ -70,25 +83,25 @@ fun PackOverviewCard(
                 iconRes = UIcons.Cards.Question,
                 iconTint = Navy500,
                 value = overview.questionCount.toString(),
-                label = strings.questionsStatLabel
+                label = strings.common.questionsStatLabel
             ),
             PackOverviewStatPageItem(
                 iconRes = UIcons.Cards.Check,
                 iconTint = Teal700,
                 value = overview.accuracyPercent?.let { "$it%" } ?: "--",
-                label = strings.accuracyStatLabel
+                label = strings.common.accuracyStatLabel
             ),
             PackOverviewStatPageItem(
                 iconRes = UIcons.Cards.Session,
                 iconTint = Gold500,
                 value = overview.sessionsCount?.toString() ?: "0",
-                label = strings.sessionsStatLabel
+                label = strings.common.sessionsStatLabel
             ),
             PackOverviewStatPageItem(
                 iconRes = UIcons.Cards.Progress,
                 iconTint = Orange700,
                 value = "${overview.progressPercent ?: 0}%",
-                label = strings.progressLabel
+                label = strings.common.progressLabel
             )
         ).chunked(2)
     }
@@ -122,7 +135,7 @@ fun PackOverviewCard(
                 )
                 UPlainIconButton(
                     iconRes = UIcons.Actions.Edit,
-                    contentDescription = strings.editPack,
+                    contentDescription = strings.common.editPack,
                     onClick = onEditClick,
                     tint = Navy400,
                     hitSize = 18.dp,
@@ -131,7 +144,7 @@ fun PackOverviewCard(
             }
             UIconActionButton(
                 iconRes = UIcons.Actions.Stats,
-                contentDescription = strings.navStats,
+                contentDescription = strings.nav.navStats,
                 onClick = onStatsClick,
                 containerColor = Navy500,
                 contentColor = Color.White,
@@ -152,7 +165,7 @@ fun PackOverviewCard(
                                 fontWeight = FontWeight.SemiBold
                             )
                         )
-                        append(if (isExpanded) strings.seeLess else strings.seeMore)
+                        append(if (isExpanded) strings.common.seeLess else strings.common.seeMore)
                         pop()
                     },
                     style = MaterialTheme.typography.bodySmall,
@@ -215,6 +228,25 @@ fun PackOverviewCard(
                 }
             }
         }
+    }
+}
+
+@UPreview
+@Composable
+private fun PackOverviewCardPreview() {
+    UTheme {
+        PackOverviewCard(
+            title = "Geografía europea",
+            description = "Repaso de capitales, ríos y cordilleras del continente.",
+            overview = PackOverviewMetrics(
+                questionCount = 24,
+                accuracyPercent = 72,
+                sessionsCount = 8,
+                progressPercent = 50,
+            ),
+            onEditClick = {},
+            onStatsClick = {},
+        )
     }
 }
 

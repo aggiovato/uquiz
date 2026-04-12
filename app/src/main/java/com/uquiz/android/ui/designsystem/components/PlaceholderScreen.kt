@@ -38,7 +38,7 @@ fun PlaceholderScreen(
                 style = MaterialTheme.typography.titleLarge,
             )
             Text(
-                text = LocalStrings.current.comingSoon,
+                text = LocalStrings.current.common.comingSoon,
                 style = MaterialTheme.typography.bodyMedium,
                 color = Neutral500,
                 textAlign = TextAlign.Center,

@@ -1,0 +1,32 @@
+@startuml game-flow
+
+start
+:Entrar desde Home, Game o Pack;
+if (Hay game activo con plan?) then (si)
+  :Reanudar attempt GAME;
+else (no)
+  :Crear attempt GAME;
+  :Construir attempt_question_plan;
+endif
+
+:Game intro;
+:Game session;
+repeat
+  :Mostrar pregunta temporizada;
+  if (Respuesta a tiempo?) then (si)
+    :Calcular score por dificultad y velocidad;
+  else (no)
+    :Aplicar penalizacion por timeout;
+  endif
+  :Persistir answer;
+repeat while (Quedan preguntas?) is (si)
+
+:Completar attempt;
+:Actualizar pack_stats;
+:Actualizar question_stats;
+:Actualizar user_rank y XP;
+:Game summary;
+:Back a ruta util previa;
+stop
+
+@enduml

@@ -92,7 +92,7 @@ fun PackRow(
                 if (questionCount > 0) {
                     Spacer(Modifier.height(2.dp))
                     Text(
-                        text = strings.questionsLabel(questionCount),
+                        text = strings.common.questionsLabel(questionCount),
                         style = MaterialTheme.typography.bodySmall,
                         color = Neutral500,
                     )
@@ -102,7 +102,7 @@ fun PackRow(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 UIconActionButton(
                     iconRes = UIcons.Actions.Edit,
-                    contentDescription = strings.editPack,
+                    contentDescription = strings.common.editPack,
                     onClick = onEditClick,
                     tone = UButtonTone.Brand,
                     elevated = false,
@@ -110,7 +110,7 @@ fun PackRow(
                 Spacer(Modifier.width(8.dp))
                 UIconActionButton(
                     iconRes = UIcons.Actions.Delete,
-                    contentDescription = strings.deletePack,
+                    contentDescription = strings.common.deletePack,
                     onClick = onDeleteClick,
                     tone = UButtonTone.Danger,
                     elevated = false,
@@ -126,7 +126,7 @@ fun PackRow(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = strings.progressLabel,
+                    text = strings.common.progressLabel,
                     style = MaterialTheme.typography.bodySmall,
                     color = Neutral500,
                 )

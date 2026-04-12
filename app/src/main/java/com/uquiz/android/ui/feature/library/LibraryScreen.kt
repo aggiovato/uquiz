@@ -3,6 +3,7 @@ package com.uquiz.android.ui.feature.library
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
@@ -31,6 +35,7 @@ import com.uquiz.android.core.files.readDocumentText
 import com.uquiz.android.core.files.requireSupportedImportExtension
 import com.uquiz.android.domain.content.model.Folder
 import com.uquiz.android.domain.content.model.Pack
+import com.uquiz.android.domain.content.projection.FolderWithCounts
 import com.uquiz.android.domain.content.repository.FolderRepository
 import com.uquiz.android.domain.content.repository.PackRepository
 import com.uquiz.android.domain.importexport.repository.ImportExportRepository
@@ -38,25 +43,41 @@ import com.uquiz.android.domain.stats.repository.PackStatsRepository
 import com.uquiz.android.ui.common.toUiMessage
 import com.uquiz.android.ui.designsystem.animations.screens.UNotFoundMascot
 import com.uquiz.android.ui.designsystem.components.SectionHeader
+import com.uquiz.android.ui.designsystem.components.UEmptyContent
 import com.uquiz.android.ui.designsystem.components.actionsheet.UActionsSheetFab
 import com.uquiz.android.ui.designsystem.components.feedback.LocalToastController
 import com.uquiz.android.ui.designsystem.components.feedback.UToastTone
 import com.uquiz.android.ui.designsystem.components.inputs.USearchField
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.Neutral400
-import com.uquiz.android.ui.designsystem.tokens.UIcons
-import com.uquiz.android.ui.designsystem.tokens.contentColorPalette
-import com.uquiz.android.ui.designsystem.tokens.folderSelectableIconPalette
-import com.uquiz.android.ui.designsystem.tokens.packSelectableIconPalette
+import com.uquiz.android.ui.designsystem.tokens.UTheme
+import com.uquiz.android.ui.feature.library.components.LibraryDialogs
+import com.uquiz.android.ui.feature.library.components.LibraryModeBanner
 import com.uquiz.android.ui.feature.library.model.LibraryDialogState
 import com.uquiz.android.ui.feature.library.model.LibraryUiEvent
 import com.uquiz.android.ui.feature.library.model.LibraryUiState
+import com.uquiz.android.ui.feature.stats.components.StaggeredStatsBlock
 import com.uquiz.android.ui.i18n.LocalStrings
 import com.uquiz.android.ui.shared.components.content.FolderListCard
 import com.uquiz.android.ui.shared.components.content.PackCard
-import com.uquiz.android.ui.shared.components.dialogs.CreateFolderDialog
-import com.uquiz.android.ui.shared.components.dialogs.CreatePackDialog
-import com.uquiz.android.ui.shared.components.dialogs.SafeDeleteEntityDialog
+import com.uquiz.android.ui.shared.model.PackListItemUiModel
 
+/**
+ * ### LibraryRoute
+ *
+ * Entrada pública de la pantalla principal de biblioteca.
+ *
+ * Resuelve el [LibraryViewModel], coordina el selector de importación y delega el
+ * renderizado puro a [LibraryScreen].
+ *
+ * @param folderRepository Repositorio de carpetas.
+ * @param packRepository Repositorio de packs.
+ * @param packStatsRepository Repositorio de estadísticas de pack.
+ * @param importExportRepository Repositorio de importación/exportación.
+ * @param onFolderClick Navega al detalle de una carpeta.
+ * @param onPackClick Navega al detalle de un pack.
+ * @param onRandomStudyClick Navega al flujo de estudio del pack indicado.
+ */
 @Composable
 fun LibraryRoute(
     folderRepository: FolderRepository,
@@ -65,6 +86,7 @@ fun LibraryRoute(
     importExportRepository: ImportExportRepository,
     onFolderClick: (id: String, name: String) -> Unit,
     onPackClick: (id: String, title: String) -> Unit,
+    onRandomStudyClick: (packId: String) -> Unit,
 ) {
     val strings = LocalStrings.current
     val context = LocalContext.current
@@ -101,6 +123,7 @@ fun LibraryRoute(
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is LibraryUiEvent.OpenImportPicker -> importLauncher.launch(arrayOf("*/*"))
+                is LibraryUiEvent.OpenRandomStudy -> onRandomStudyClick(event.packId)
                 is LibraryUiEvent.ShowToast -> toastController.show(event.message, event.tone)
             }
         }
@@ -109,6 +132,7 @@ fun LibraryRoute(
     LibraryScreen(
         uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
+        onRandomStudyClick = viewModel::onRandomStudyRequested,
         onFolderClick = { folder -> onFolderClick(folder.id, folder.name) },
         onPackClick = { pack -> onPackClick(pack.id, pack.title) },
         onEditFolderClick = viewModel::onEditFolderRequested,
@@ -128,6 +152,7 @@ fun LibraryRoute(
 private fun LibraryScreen(
     uiState: LibraryUiState,
     onSearchQueryChange: (String) -> Unit,
+    onRandomStudyClick: () -> Unit,
     onFolderClick: (Folder) -> Unit,
     onPackClick: (Pack) -> Unit,
     onEditFolderClick: (Folder) -> Unit,
@@ -140,33 +165,63 @@ private fun LibraryScreen(
     onDeleteFolderConfirm: (Folder) -> Unit,
     onEditPackConfirm: (Pack, String, String?, String, String) -> Unit,
     onDeletePackConfirm: (Pack) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val strings = LocalStrings.current
+    var contentVisible by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    LaunchedEffect(uiState.isLoading) {
+        if (!uiState.isLoading) contentVisible = true
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
         ) {
             item {
+                LibraryModeBanner(
+                    visible = contentVisible,
+                    enabled = uiState.hasStudiablePacks,
+                    onRandomStudyClick = onRandomStudyClick,
+                )
+                Spacer(Modifier.height(16.dp))
                 USearchField(
                     value = uiState.searchQuery,
                     onValueChange = onSearchQueryChange,
-                    placeholder = LocalStrings.current.searchPlaceholder,
+                    placeholder = strings.common.searchPlaceholder,
                     leadingIcon = rememberVectorPainter(Icons.Outlined.Search),
                 )
             }
 
-            if (uiState.searchQuery.isNotBlank() && uiState.filteredFolders.isEmpty() &&
+            if (uiState.searchQuery.isBlank() &&
+                uiState.filteredFolders.isEmpty() &&
+                uiState.filteredPacks.isEmpty() &&
+                !uiState.isLoading
+            ) {
+                // Biblioteca vacía: el usuario no ha creado ningún contenido todavía.
+                item {
+                    UEmptyContent(
+                        message = strings.common.nothingHereYet,
+                        modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                    )
+                }
+            }
+
+            if (uiState.searchQuery.isNotBlank() &&
+                uiState.filteredFolders.isEmpty() &&
                 uiState.filteredPacks.isEmpty()
             ) {
+                // Sin resultados de búsqueda.
                 item {
                     UNotFoundMascot(modifier = Modifier.fillMaxWidth().wrapContentHeight())
                     Text(
-                        text = strings.noSearchResults,
+                        text = strings.common.noSearchResults,
                         style = MaterialTheme.typography.bodyLarge,
                         color = Neutral400,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -175,35 +230,48 @@ private fun LibraryScreen(
             if (uiState.filteredFolders.isNotEmpty()) {
                 item {
                     Spacer(Modifier.height(24.dp))
-                    SectionHeader(strings.foldersSection)
-                    Spacer(Modifier.height(8.dp))
-                    FolderListCard(
-                        folders = uiState.filteredFolders,
-                        onFolderClick = onFolderClick,
-                        onEditFolderClick = onEditFolderClick,
-                        onDeleteFolderClick = onDeleteFolderClick,
-                    )
+                    StaggeredStatsBlock(visible = contentVisible, delayMillis = 60) {
+                        Column {
+                            SectionHeader(strings.library.foldersSection)
+                            Spacer(Modifier.height(8.dp))
+                            FolderListCard(
+                                folders = uiState.filteredFolders,
+                                onFolderClick = onFolderClick,
+                                onEditFolderClick = onEditFolderClick,
+                                onDeleteFolderClick = onDeleteFolderClick,
+                            )
+                        }
+                    }
                 }
             }
 
             if (uiState.filteredPacks.isNotEmpty()) {
                 item {
                     Spacer(Modifier.height(24.dp))
-                    SectionHeader(strings.recentPacksSection)
+                    StaggeredStatsBlock(visible = contentVisible, delayMillis = 120) {
+                        SectionHeader(strings.library.recentPacksSection)
+                    }
                     Spacer(Modifier.height(8.dp))
                 }
                 itemsIndexed(uiState.filteredPacks, key = { _, item -> item.pack.id }) { index, item ->
-                    PackCard(
-                        pack = item.pack,
-                        questionCount = item.questionCount,
-                        answeredCount = item.answeredCount,
-                        progress = item.progress,
-                        accentIndex = index,
-                        onClick = { onPackClick(item.pack) },
-                        onEditClick = { onEditPackClick(item.pack) },
-                        onDeleteClick = { onDeletePackClick(item.pack) },
-                    )
-                    Spacer(Modifier.height(10.dp))
+                    StaggeredStatsBlock(
+                        visible = contentVisible,
+                        delayMillis = 120 + minOf(index, 4) * 60,
+                    ) {
+                        Column {
+                            PackCard(
+                                pack = item.pack,
+                                questionCount = item.questionCount,
+                                answeredCount = item.answeredCount,
+                                progress = item.progress,
+                                accentIndex = index,
+                                onClick = { onPackClick(item.pack) },
+                                onEditClick = { onEditPackClick(item.pack) },
+                                onDeleteClick = { onDeletePackClick(item.pack) },
+                            )
+                            Spacer(Modifier.height(10.dp))
+                        }
+                    }
                 }
             }
 
@@ -216,76 +284,69 @@ private fun LibraryScreen(
         )
     }
 
-    when (val dialog = uiState.dialogState) {
-        LibraryDialogState.None -> {
-            Unit
-        }
+    LibraryDialogs(
+        dialogState = uiState.dialogState,
+        onDialogDismiss = onDialogDismiss,
+        onCreateFolderConfirm = onCreateFolderConfirm,
+        onEditFolderConfirm = onEditFolderConfirm,
+        onDeleteFolderConfirm = onDeleteFolderConfirm,
+        onEditPackConfirm = onEditPackConfirm,
+        onDeletePackConfirm = onDeletePackConfirm,
+    )
+}
 
-        LibraryDialogState.CreateFolder -> {
-            CreateFolderDialog(
-                title = strings.newFolder,
-                description = strings.createFolderDescription,
-                confirmLabel = strings.create,
-                onDismiss = onDialogDismiss,
-                onConfirm = onCreateFolderConfirm,
-            )
-        }
-
-        is LibraryDialogState.EditFolder -> {
-            CreateFolderDialog(
-                title = strings.editFolder,
-                description = strings.editFolderDescription,
-                confirmLabel = strings.save,
-                onDismiss = onDialogDismiss,
-                onConfirm = { name, colorHex, icon ->
-                    onEditFolderConfirm(dialog.folder, name, colorHex, icon)
-                },
-                initialName = dialog.folder.name,
-                initialColorHex = dialog.folder.colorHex ?: contentColorPalette.first().hex,
-                initialIcon = dialog.folder.icon ?: folderSelectableIconPalette.first().key,
-            )
-        }
-
-        is LibraryDialogState.DeleteFolder -> {
-            SafeDeleteEntityDialog(
-                title = strings.deleteFolder,
-                primaryMessage = strings.deleteFolderPrimaryMessage,
-                secondaryMessage = strings.deleteFolderSecondaryMessage,
-                requiredKeyword = strings.deleteFolderKeyword,
-                keywordInstruction = strings.deleteFolderTypeKeywordInstruction(strings.deleteFolderKeyword),
-                headerIconRes = UIcons.Content.Folder.Error,
-                onDismiss = onDialogDismiss,
-                onConfirm = { onDeleteFolderConfirm(dialog.folder) },
-            )
-        }
-
-        is LibraryDialogState.EditPack -> {
-            CreatePackDialog(
-                title = strings.editPack,
-                description = strings.editPackDescription,
-                confirmLabel = strings.save,
-                onDismiss = onDialogDismiss,
-                onConfirm = { title, description, colorHex, icon ->
-                    onEditPackConfirm(dialog.pack, title, description, colorHex, icon)
-                },
-                initialTitle = dialog.pack.title,
-                initialDescription = dialog.pack.description.orEmpty(),
-                initialColorHex = dialog.pack.colorHex ?: contentColorPalette.first().hex,
-                initialIcon = dialog.pack.icon ?: packSelectableIconPalette.first().key,
-            )
-        }
-
-        is LibraryDialogState.DeletePack -> {
-            SafeDeleteEntityDialog(
-                title = strings.deletePack,
-                primaryMessage = strings.deletePackPrimaryMessage,
-                secondaryMessage = strings.deletePackSecondaryMessage,
-                requiredKeyword = strings.deletePackKeyword,
-                keywordInstruction = strings.deletePackTypeKeywordInstruction(strings.deletePackKeyword),
-                headerIconRes = UIcons.Content.Pack.Error,
-                onDismiss = onDialogDismiss,
-                onConfirm = { onDeletePackConfirm(dialog.pack) },
-            )
-        }
+@UPreview
+@Composable
+private fun LibraryScreenPreview() {
+    UTheme {
+        LibraryScreen(
+            uiState = LibraryUiState(
+                isLoading = false,
+                hasStudiablePacks = true,
+                searchQuery = "",
+                filteredFolders = listOf(
+                    FolderWithCounts(
+                        folder = Folder(
+                            id = "folder-1",
+                            name = "Idiomas",
+                            createdAt = 0L,
+                            updatedAt = 0L,
+                        ),
+                        subfolderCount = 2,
+                        packCount = 4,
+                    ),
+                ),
+                filteredPacks = listOf(
+                    PackListItemUiModel(
+                        pack = Pack(
+                            id = "pack-1",
+                            title = "Verbos irregulares",
+                            description = null,
+                            folderId = "folder-1",
+                            createdAt = 0L,
+                            updatedAt = 0L,
+                        ),
+                        questionCount = 24,
+                        answeredCount = 10,
+                        progress = 0.42f,
+                    ),
+                ),
+                dialogState = LibraryDialogState.None,
+            ),
+            onSearchQueryChange = {},
+            onRandomStudyClick = {},
+            onFolderClick = {},
+            onPackClick = {},
+            onEditFolderClick = {},
+            onDeleteFolderClick = {},
+            onEditPackClick = {},
+            onDeletePackClick = {},
+            onDialogDismiss = {},
+            onCreateFolderConfirm = { _, _, _ -> },
+            onEditFolderConfirm = { _, _, _, _ -> },
+            onDeleteFolderConfirm = {},
+            onEditPackConfirm = { _, _, _, _, _ -> },
+            onDeletePackConfirm = {},
+        )
     }
 }

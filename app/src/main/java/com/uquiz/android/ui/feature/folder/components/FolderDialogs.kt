@@ -47,13 +47,13 @@ internal fun FolderDialogs(
 ) {
     val strings = LocalStrings.current
 
-    when (val dialog = dialogState) {
+    when (dialogState) {
         FolderDialogState.None -> Unit
         FolderDialogState.CreateFolder -> {
             CreateFolderDialog(
-                title = strings.newFolder,
-                description = strings.createFolderDescription,
-                confirmLabel = strings.create,
+                title = strings.common.newFolder,
+                description = strings.common.createFolderDescription,
+                confirmLabel = strings.common.create,
                 onDismiss = onDialogDismiss,
                 onConfirm = onCreateFolderConfirm,
             )
@@ -61,9 +61,9 @@ internal fun FolderDialogs(
 
         FolderDialogState.CreatePack -> {
             CreatePackDialog(
-                title = strings.newPack,
-                description = strings.createPackDescription,
-                confirmLabel = strings.create,
+                title = strings.common.newPack,
+                description = strings.common.createPackDescription,
+                confirmLabel = strings.common.create,
                 onDismiss = onDialogDismiss,
                 onConfirm = onCreatePackConfirm,
             )
@@ -71,68 +71,68 @@ internal fun FolderDialogs(
 
         is FolderDialogState.EditFolder -> {
             CreateFolderDialog(
-                title = strings.editFolder,
-                description = strings.editFolderDescription,
-                confirmLabel = strings.save,
+                title = strings.common.editFolder,
+                description = strings.common.editFolderDescription,
+                confirmLabel = strings.common.save,
                 onDismiss = onDialogDismiss,
                 onConfirm = { name, colorHex, icon ->
-                    onEditFolderConfirm(dialog.folder, name, colorHex, icon)
+                    onEditFolderConfirm(dialogState.folder, name, colorHex, icon)
                 },
-                initialName = dialog.folder.name,
-                initialColorHex = dialog.folder.colorHex ?: contentColorPalette.first().hex,
-                initialIcon = dialog.folder.icon ?: folderSelectableIconPalette.first().key,
+                initialName = dialogState.folder.name,
+                initialColorHex = dialogState.folder.colorHex ?: contentColorPalette.first().hex,
+                initialIcon = dialogState.folder.icon ?: folderSelectableIconPalette.first().key,
             )
         }
 
         is FolderDialogState.DeleteFolder -> {
             SafeDeleteEntityDialog(
-                title = strings.deleteFolder,
-                primaryMessage = strings.deleteFolderPrimaryMessage,
-                secondaryMessage = strings.deleteFolderSecondaryMessage,
-                requiredKeyword = strings.deleteFolderKeyword,
-                keywordInstruction = strings.deleteFolderTypeKeywordInstruction(strings.deleteFolderKeyword),
+                title = strings.common.deleteFolder,
+                primaryMessage = strings.common.deleteFolderPrimaryMessage,
+                secondaryMessage = strings.common.deleteFolderSecondaryMessage,
+                requiredKeyword = strings.common.deleteFolderKeyword,
+                keywordInstruction = strings.common.deleteFolderTypeKeywordInstruction(strings.common.deleteFolderKeyword),
                 headerIconRes = UIcons.Content.Folder.Error,
                 onDismiss = onDialogDismiss,
-                onConfirm = { onDeleteFolderConfirm(dialog.folder) },
+                onConfirm = { onDeleteFolderConfirm(dialogState.folder) },
             )
         }
 
         is FolderDialogState.EditPack -> {
             CreatePackDialog(
-                title = strings.editPack,
-                description = strings.editPackDescription,
-                confirmLabel = strings.save,
+                title = strings.common.editPack,
+                description = strings.common.editPackDescription,
+                confirmLabel = strings.common.save,
                 onDismiss = onDialogDismiss,
                 onConfirm = { title, description, colorHex, icon ->
-                    onEditPackConfirm(dialog.pack, title, description, colorHex, icon)
+                    onEditPackConfirm(dialogState.pack, title, description, colorHex, icon)
                 },
-                initialTitle = dialog.pack.title,
-                initialDescription = dialog.pack.description.orEmpty(),
-                initialColorHex = dialog.pack.colorHex ?: contentColorPalette.first().hex,
-                initialIcon = dialog.pack.icon ?: packSelectableIconPalette.first().key,
+                initialTitle = dialogState.pack.title,
+                initialDescription = dialogState.pack.description.orEmpty(),
+                initialColorHex = dialogState.pack.colorHex ?: contentColorPalette.first().hex,
+                initialIcon = dialogState.pack.icon ?: packSelectableIconPalette.first().key,
             )
         }
 
         is FolderDialogState.DeletePack -> {
             SafeDeleteEntityDialog(
-                title = strings.deletePack,
-                primaryMessage = strings.deletePackPrimaryMessage,
-                secondaryMessage = strings.deletePackSecondaryMessage,
-                requiredKeyword = strings.deletePackKeyword,
-                keywordInstruction = strings.deletePackTypeKeywordInstruction(strings.deletePackKeyword),
+                title = strings.common.deletePack,
+                primaryMessage = strings.common.deletePackPrimaryMessage,
+                secondaryMessage = strings.common.deletePackSecondaryMessage,
+                requiredKeyword = strings.common.deletePackKeyword,
+                keywordInstruction = strings.common.deletePackTypeKeywordInstruction(strings.common.deletePackKeyword),
                 headerIconRes = UIcons.Content.Pack.Error,
                 onDismiss = onDialogDismiss,
-                onConfirm = { onDeletePackConfirm(dialog.pack) },
+                onConfirm = { onDeletePackConfirm(dialogState.pack) },
             )
         }
 
         FolderDialogState.DeleteCurrentFolder -> {
             SafeDeleteEntityDialog(
-                title = strings.deleteFolder,
-                primaryMessage = strings.deleteFolderPrimaryMessage,
-                secondaryMessage = strings.deleteFolderSecondaryMessage,
-                requiredKeyword = strings.deleteFolderKeyword,
-                keywordInstruction = strings.deleteFolderTypeKeywordInstruction(strings.deleteFolderKeyword),
+                title = strings.common.deleteFolder,
+                primaryMessage = strings.common.deleteFolderPrimaryMessage,
+                secondaryMessage = strings.common.deleteFolderSecondaryMessage,
+                requiredKeyword = strings.common.deleteFolderKeyword,
+                keywordInstruction = strings.common.deleteFolderTypeKeywordInstruction(strings.common.deleteFolderKeyword),
                 headerIconRes = UIcons.Content.Folder.Error,
                 onDismiss = onDialogDismiss,
                 onConfirm = onDeleteCurrentFolderConfirm,

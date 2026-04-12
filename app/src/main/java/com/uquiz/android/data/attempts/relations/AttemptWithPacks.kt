@@ -8,9 +8,8 @@ import com.uquiz.android.data.attempts.entity.AttemptPackEntity
 import com.uquiz.android.data.content.entity.PackEntity
 
 /**
- * Room relation: Attempt with its Packs (through junction table)
- *
- * Used for showing which packs were used in a Game mode session
+ * Relación Room: intento con los packs usados (vía tabla de unión `attempt_packs`).
+ * Usada para mostrar qué packs formaron parte de una sesión de Game mode.
  */
 data class AttemptWithPacks(
     @Embedded

@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 
+/**
+ * Implementación de [FolderRepository]. Aplica validación de nombres antes de escribir
+ * y construye la ruta de carpetas de forma iterativa cargando todas las carpetas en memoria.
+ */
 class FolderRepositoryImpl(
     private val folderDao: FolderDao
 ) : FolderRepository {

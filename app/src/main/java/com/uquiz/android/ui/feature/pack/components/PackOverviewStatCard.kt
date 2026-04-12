@@ -20,10 +20,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.Neutral50
 import com.uquiz.android.ui.designsystem.tokens.Neutral700
 import com.uquiz.android.ui.designsystem.tokens.URadius
+import com.uquiz.android.ui.designsystem.tokens.UTheme
+import com.uquiz.android.ui.designsystem.tokens.UIcons
+import com.uquiz.android.ui.designsystem.tokens.Navy500
 
+/**
+ * ### PackOverviewStatCard
+ *
+ * Tarjeta compacta para una métrica resumida dentro del encabezado o bottom sheet del pack.
+ *
+ * @param iconRes Recurso del icono asociado a la métrica.
+ * @param iconTint Color aplicado al icono y al valor.
+ * @param value Valor principal de la métrica.
+ * @param label Etiqueta descriptiva de la métrica.
+ */
 @Composable
 fun PackOverviewStatCard(
     @DrawableRes iconRes: Int,
@@ -63,6 +77,19 @@ fun PackOverviewStatCard(
             color = Neutral700,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@UPreview
+@Composable
+private fun PackOverviewStatCardPreview() {
+    UTheme {
+        PackOverviewStatCard(
+            iconRes = UIcons.Cards.Question,
+            iconTint = Navy500,
+            value = "24",
+            label = "Preguntas",
         )
     }
 }

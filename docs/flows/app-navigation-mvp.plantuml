@@ -1,0 +1,34 @@
+@startuml app-navigation-mvp
+
+start
+:Launch app;
+:Home;
+
+if (Accion del usuario) then (Library)
+  :Library;
+  :Folder;
+  :Pack;
+elseif (Study)
+  :Study intro;
+  :Study session;
+  :Study summary;
+elseif (Game)
+  :Game home;
+  :Game intro;
+  :Game session;
+  :Game summary;
+elseif (Stats)
+  :User stats;
+  if (Abrir pack stats) then (si)
+    :Pack stats;
+    :Pack stats help;
+  endif
+  :User stats help\n(objetivo MVP);
+elseif (Preferences)
+  :Preferences;
+  :About the app\n(objetivo MVP);
+endif
+
+stop
+
+@enduml

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.uquiz.android.ui.designsystem.components.cards.UIconBadge
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.AppRadius
 import com.uquiz.android.ui.designsystem.tokens.Ink950
 import com.uquiz.android.ui.designsystem.tokens.Neutral100
@@ -30,12 +31,22 @@ import com.uquiz.android.ui.designsystem.tokens.Neutral200
 import com.uquiz.android.ui.designsystem.tokens.Neutral500
 import com.uquiz.android.ui.designsystem.tokens.Teal700
 import com.uquiz.android.ui.designsystem.tokens.UIcons
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.feature.home.model.ContinuePackUiModel
 import com.uquiz.android.ui.i18n.LocalStrings
 import com.uquiz.android.ui.designsystem.tokens.contentAccents
 import com.uquiz.android.ui.designsystem.tokens.contentColorFromHex
 import com.uquiz.android.ui.designsystem.tokens.contentIconResForKey
 
+/**
+ * ### HomeContinuePackCard
+ *
+ * Tarjeta resumida de un pack con progreso pendiente desde la pantalla Home.
+ *
+ * @param item Modelo de UI con título, conteos y progreso del pack.
+ * @param accentIndex Índice usado para alternar el acento visual de la tarjeta.
+ * @param onClick Acción al pulsar la tarjeta.
+ */
 @Composable
 fun HomeContinuePackCard(
     item: ContinuePackUiModel,
@@ -90,7 +101,7 @@ fun HomeContinuePackCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = strings.progressLabel,
+                    text = strings.common.progressLabel,
                     style = MaterialTheme.typography.bodySmall,
                     color = Neutral500
                 )
@@ -112,5 +123,25 @@ fun HomeContinuePackCard(
                 trackColor = Neutral200
             )
         }
+    }
+}
+
+@UPreview
+@Composable
+private fun HomeContinuePackCardPreview() {
+    UTheme {
+        HomeContinuePackCard(
+            item = ContinuePackUiModel(
+                packId = "pack-1",
+                title = "Historia moderna",
+                answeredCount = 8,
+                totalQuestions = 20,
+                progressFraction = 0.4f,
+                icon = null,
+                colorHex = null,
+            ),
+            accentIndex = 0,
+            onClick = {},
+        )
     }
 }

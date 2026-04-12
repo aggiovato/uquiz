@@ -10,6 +10,10 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
+/**
+ * Conversores de tipos Room para los enums del dominio y para listas de cadenas (almacenadas como JSON).
+ * Registrado globalmente en [UQuizDatabase] vía `@TypeConverters`.
+ */
 class Converters {
     private val json = Json {
         encodeDefaults = true
@@ -19,20 +23,16 @@ class Converters {
 
     private val listOfStringSerializer = ListSerializer(String.serializer())
 
-    // Function to convert from a list of string to a json
-    // insertable in a column of the SQLite room as a string
+    // Lista de strings serializada como JSON para almacenarse en una columna SQLite.
     @TypeConverter
     fun stringListToJson(value: List<String>): String =
         json.encodeToString(listOfStringSerializer, value)
 
-    // Function to deserialize a string in db (json) into
-    // a list of strings
     @TypeConverter
     fun jsonToStringList(value: String): List<String> =
         if (value.isBlank()) emptyList()
         else json.decodeFromString(listOfStringSerializer, value)
 
-    // DifficultyLevel converters
     @TypeConverter
     fun difficultyLevelToString(value: DifficultyLevel): String = value.name
 
@@ -40,7 +40,6 @@ class Converters {
     fun stringToDifficultyLevel(value: String): DifficultyLevel =
         DifficultyLevel.valueOf(value)
 
-    // AttemptMode converters
     @TypeConverter
     fun attemptModeToString(value: AttemptMode): String = value.name
 

@@ -54,18 +54,22 @@ fun UOutlinedButton(
     val contentPadding = when (size) {
         UButtonSize.Regular -> PaddingValues(horizontal = 30.dp, vertical = 2.dp)
         UButtonSize.Compact -> PaddingValues(horizontal = 16.dp, vertical = 0.dp)
+        UButtonSize.Tiny -> PaddingValues(horizontal = 10.dp, vertical = 0.dp)
     }
     val minHeight = when (size) {
         UButtonSize.Regular -> 48.dp
         UButtonSize.Compact -> 38.dp
+        UButtonSize.Tiny -> 30.dp
     }
     val iconSize = when (size) {
         UButtonSize.Regular -> 18.dp
         UButtonSize.Compact -> 16.dp
+        UButtonSize.Tiny -> 12.dp
     }
     val textStyle = when (size) {
         UButtonSize.Regular -> MaterialTheme.typography.labelLarge
         UButtonSize.Compact -> MaterialTheme.typography.labelMedium
+        UButtonSize.Tiny -> MaterialTheme.typography.labelSmall
     }
     OutlinedButton(
         onClick = onClick,
@@ -89,7 +93,7 @@ fun UOutlinedButton(
                 Icon(
                     painter = painterResource(leadingIconRes),
                     contentDescription = null,
-                    tint = leadingIconTint ?: contentColor,
+                    tint = if (!enabled) Neutral400 else leadingIconTint ?: contentColor,
                     modifier = Modifier.size(iconSize),
                 )
                 Spacer(Modifier.width(8.dp))

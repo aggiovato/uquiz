@@ -36,7 +36,7 @@ fun UActionsSheetContent(
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         Text(
-            text = strings.actionsLabel,
+            text = strings.common.actionsLabel,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(bottom = 4.dp),
         )

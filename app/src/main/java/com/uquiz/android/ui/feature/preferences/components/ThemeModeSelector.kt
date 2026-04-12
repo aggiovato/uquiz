@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.uquiz.android.domain.user.enums.AppThemeMode
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.AppRadius
 import com.uquiz.android.ui.designsystem.tokens.BrandNavy
 import com.uquiz.android.ui.designsystem.tokens.Ink950
@@ -27,17 +28,15 @@ import com.uquiz.android.ui.designsystem.tokens.Navy300
 import com.uquiz.android.ui.designsystem.tokens.Neutral100
 import com.uquiz.android.ui.designsystem.tokens.Neutral400
 import com.uquiz.android.ui.designsystem.tokens.UIcons
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 
 /**
- * ## ThemeModeSelector
- * Three-option segmented selector for [AppThemeMode].
+ * ### ThemeModeSelector
  *
- * Each option renders an icon and a label. The selected option is highlighted
- * with a navy tinted surface and a navy border; unselected options use a neutral
- * surface. All options share equal horizontal weight.
+ * Selector segmentado de tres opciones para cambiar el tema de la aplicación.
  *
- * @param selected Currently active [AppThemeMode].
- * @param onSelect Callback invoked when the user taps an unselected option.
+ * @param selected Tema actualmente seleccionado.
+ * @param onSelect Acción invocada al elegir un tema distinto.
  */
 @Composable
 fun ThemeModeSelector(
@@ -88,4 +87,15 @@ private enum class ThemeModeOption(val mode: AppThemeMode, val label: String, va
     Light(AppThemeMode.LIGHT, "Light", UIcons.Actions.LightMode),
     Dark(AppThemeMode.DARK, "Dark", UIcons.Actions.DarkMode),
     System(AppThemeMode.SYSTEM, "System", UIcons.Actions.Settings)
+}
+
+@UPreview
+@Composable
+private fun ThemeModeSelectorPreview() {
+    UTheme {
+        ThemeModeSelector(
+            selected = AppThemeMode.SYSTEM,
+            onSelect = {},
+        )
+    }
 }

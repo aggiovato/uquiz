@@ -7,10 +7,8 @@ import com.uquiz.android.data.content.entity.PackEntity
 import com.uquiz.android.data.content.entity.PackQuestionEntity
 
 /**
- * Room relation: Pack with Questions and their Options (nested)
- *
- * Used for loading complete pack data for Study/Game modes
- * This is a nested relation - each question includes its options
+ * Relación Room anidada: pack con sus preguntas y las opciones de cada pregunta.
+ * Usada para cargar los datos completos de una sesión de estudio o partida.
  */
 data class PackWithQuestionsAndOptions(
     @Embedded

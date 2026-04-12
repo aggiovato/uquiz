@@ -17,9 +17,9 @@ internal fun studyDifficultyInfo(
     difficulty: DifficultyLevel,
     strings: AppStrings
 ): Pair<String, Color> = when (difficulty) {
-    DifficultyLevel.EASY -> strings.difficultyEasy to Teal500
-    DifficultyLevel.MEDIUM -> strings.difficultyMedium to Gold500
-    DifficultyLevel.HARD, DifficultyLevel.EXPERT -> strings.difficultyHard to Navy200
+    DifficultyLevel.EASY -> strings.common.difficultyEasy to Teal500
+    DifficultyLevel.MEDIUM -> strings.common.difficultyMedium to Gold500
+    DifficultyLevel.HARD, DifficultyLevel.EXPERT -> strings.common.difficultyHard to Navy200
 }
 
 /**

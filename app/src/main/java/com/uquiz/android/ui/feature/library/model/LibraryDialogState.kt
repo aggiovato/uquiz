@@ -4,7 +4,7 @@ import com.uquiz.android.domain.content.model.Folder
 import com.uquiz.android.domain.content.model.Pack
 
 /**
- *
+ * Estado de diálogos visibles en la pantalla de biblioteca.
  */
 sealed interface LibraryDialogState {
     data object None : LibraryDialogState

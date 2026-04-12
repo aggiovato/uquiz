@@ -23,10 +23,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.uquiz.android.ui.designsystem.tokens.BrandNavy
-import com.uquiz.android.ui.navigation.NavigationTrailItem
+import com.uquiz.android.ui.navigation.chrome.NavigationChromeVariant
+import com.uquiz.android.ui.navigation.tree.NavigationTrailItem
 
 private sealed interface UTrailToken {
-    data class Item(val item: NavigationTrailItem) : UTrailToken
+    data class Item(
+        val item: NavigationTrailItem,
+    ) : UTrailToken
+
     data object Ellipsis : UTrailToken
 }
 
@@ -43,58 +47,72 @@ fun UNavigationTrailBar(
     variant: NavigationChromeVariant = NavigationChromeVariant.Default,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = when (variant) {
-        NavigationChromeVariant.Default -> BrandNavy
-        NavigationChromeVariant.TransparentLight -> Color.Transparent
-    }
-    val primaryColor = when (variant) {
-        NavigationChromeVariant.Default -> Color.White
-        NavigationChromeVariant.TransparentLight -> Color.White.copy(alpha = 0.95f)
-    }
+    val backgroundColor =
+        when (variant) {
+            NavigationChromeVariant.Default -> BrandNavy
+            NavigationChromeVariant.TransparentLight -> Color.Transparent
+        }
+    val primaryColor =
+        when (variant) {
+            NavigationChromeVariant.Default -> Color.White
+            NavigationChromeVariant.TransparentLight -> Color.White.copy(alpha = 0.95f)
+        }
     val secondaryColor = primaryColor.copy(alpha = 0.6f)
     val dividerColor = primaryColor.copy(alpha = 0.4f)
     val ellipsisBackground = primaryColor.copy(alpha = 0.12f)
-    val animatedBackgroundColor = animateColorAsState(
-        targetValue = backgroundColor,
-        animationSpec = tween(durationMillis = 260),
-        label = "trailBackground",
-    )
-    val animatedPrimaryColor = animateColorAsState(
-        targetValue = primaryColor,
-        animationSpec = tween(durationMillis = 260),
-        label = "trailPrimary",
-    )
-    val animatedSecondaryColor = animateColorAsState(
-        targetValue = secondaryColor,
-        animationSpec = tween(durationMillis = 260),
-        label = "trailSecondary",
-    )
-    val animatedDividerColor = animateColorAsState(
-        targetValue = dividerColor,
-        animationSpec = tween(durationMillis = 260),
-        label = "trailDivider",
-    )
-    val animatedEllipsisBackground = animateColorAsState(
-        targetValue = ellipsisBackground,
-        animationSpec = tween(durationMillis = 260),
-        label = "trailEllipsis",
-    )
-    val visibleTrail = when {
-        trail.size <= 3 -> trail.map { UTrailToken.Item(it) }
-        else -> listOf(
-            UTrailToken.Item(trail.first()),
-            UTrailToken.Ellipsis,
-            UTrailToken.Item(trail[trail.lastIndex - 1]),
-            UTrailToken.Item(trail.last()),
+    val animatedBackgroundColor =
+        animateColorAsState(
+            targetValue = backgroundColor,
+            animationSpec = tween(durationMillis = 260),
+            label = "trailBackground",
         )
-    }
+    val animatedPrimaryColor =
+        animateColorAsState(
+            targetValue = primaryColor,
+            animationSpec = tween(durationMillis = 260),
+            label = "trailPrimary",
+        )
+    val animatedSecondaryColor =
+        animateColorAsState(
+            targetValue = secondaryColor,
+            animationSpec = tween(durationMillis = 260),
+            label = "trailSecondary",
+        )
+    val animatedDividerColor =
+        animateColorAsState(
+            targetValue = dividerColor,
+            animationSpec = tween(durationMillis = 260),
+            label = "trailDivider",
+        )
+    val animatedEllipsisBackground =
+        animateColorAsState(
+            targetValue = ellipsisBackground,
+            animationSpec = tween(durationMillis = 260),
+            label = "trailEllipsis",
+        )
+    val visibleTrail =
+        when {
+            trail.size <= 3 -> {
+                trail.map { UTrailToken.Item(it) }
+            }
+
+            else -> {
+                listOf(
+                    UTrailToken.Item(trail.first()),
+                    UTrailToken.Ellipsis,
+                    UTrailToken.Item(trail[trail.lastIndex - 1]),
+                    UTrailToken.Item(trail.last()),
+                )
+            }
+        }
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(animatedBackgroundColor.value)
-            .padding(bottom = 10.dp)
-            .padding(horizontal = 16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(animatedBackgroundColor.value)
+                .padding(bottom = 10.dp)
+                .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         visibleTrail.forEachIndexed { index, token ->
@@ -109,9 +127,10 @@ fun UNavigationTrailBar(
             when (token) {
                 UTrailToken.Ellipsis -> {
                     Box(
-                        modifier = Modifier
-                            .background(animatedEllipsisBackground.value, RoundedCornerShape(999.dp))
-                            .padding(horizontal = 5.dp, vertical = 0.dp),
+                        modifier =
+                            Modifier
+                                .background(animatedEllipsisBackground.value, RoundedCornerShape(999.dp))
+                                .padding(horizontal = 5.dp, vertical = 0.dp),
                     ) {
                         Text(
                             text = "...",

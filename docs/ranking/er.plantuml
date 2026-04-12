@@ -10,7 +10,7 @@ entity "user_rank" as UserRank <<ranking>> {
     currentRank             : TEXT    NOT NULL
     ..INITIATE|NEOPHYTE|ACOLYTE|DISCIPLE..
     ..ADEPT|VIRTUOSO|ARCHON|PARAGON..
-    mmr                     : REAL    NOT NULL  DEFAULT 1200.0
+    mmr                     : REAL    NOT NULL  DEFAULT 600.0
     perfEwma                : REAL    NOT NULL  DEFAULT 0.5
     lifetimeCorrect         : INTEGER NOT NULL  DEFAULT 0
     lifetimeIncorrect       : INTEGER NOT NULL  DEFAULT 0
@@ -26,19 +26,22 @@ entity "user_rank" as UserRank <<ranking>> {
 
 note right of UserRank
   Escala MMR:
-  < 800   INITIATE
-  < 1100  NEOPHYTE
-  < 1400  ACOLYTE
-  < 1700  DISCIPLE
-  < 2100  ADEPT
-  < 2500  VIRTUOSO
-  < 3000  ARCHON
-  >= 3000 PARAGON
+  < 400   INITIATE
+  < 700   NEOPHYTE
+  < 1000  ACOLYTE
+  < 1300  DISCIPLE
+  < 1650  ADEPT
+  < 2000  VIRTUOSO
+  < 2500  ARCHON
+  >= 2500 PARAGON
 
   PK = userId (1:1 con UserProfile).
   mmr acumulado por sesion completada.
   perfEwma = media exponencial del
-  rendimiento reciente (0.0-1.0).
+  rendimiento reciente.
+  La promocion exige superar
+  el umbral del siguiente rango
+  + 50 de histeresis.
 end note
 
 @enduml

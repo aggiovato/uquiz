@@ -4,6 +4,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 
+/**
+ * Fila de la tabla de unión `pack_questions`. Asocia un pack con sus preguntas
+ * y registra el [sortOrder] que determina el orden de presentación.
+ */
 @Entity(
     tableName = "pack_questions",
     primaryKeys = ["packId", "questionId"],

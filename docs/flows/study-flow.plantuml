@@ -1,0 +1,27 @@
+@startuml study-flow
+
+start
+:Entrar desde Home o Pack;
+if (Hay intento activo?) then (si)
+  :Reanudar attempt STUDY;
+else (no)
+  :Crear nuevo attempt STUDY;
+endif
+
+:Study intro;
+:Study session;
+repeat
+  :Mostrar pregunta;
+  :Registrar respuesta;
+  :Mostrar explicacion si aplica;
+repeat while (Quedan preguntas?) is (si)
+
+:Completar attempt;
+:Actualizar question_stats;
+:Actualizar pack_stats;
+:Actualizar user stats agregados;
+:Study summary;
+:Back a ruta util previa;
+stop
+
+@enduml

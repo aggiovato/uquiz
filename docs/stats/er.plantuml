@@ -58,8 +58,17 @@ entity "pack_stats" as PackStats <<stats>> {
     updatedAt                   : INTEGER NOT NULL
 }
 
-QuestionStats   }o--||  QuestionStats   : "questionId / CASCADE"
-PackStats       }o--||  PackStats       : "packId / CASCADE"
+entity "questions" as Question <<content>> {
+    PK(id)                  : TEXT
+}
+
+entity "packs" as Pack <<content>> {
+    PK(id)                  : TEXT
+}
+
+QuestionStats   }o--||  Question        : "questionId / CASCADE"
+QuestionStats   }o--||  Pack            : "packId / CASCADE"
+PackStats       }o--||  Pack            : "packId / CASCADE"
 
 note right of QuestionStats
   masteryScore (0.0-1.0) determina
@@ -72,6 +81,8 @@ note right of PackStats
   progressPercent =
   dominatedQuestions /
   totalQuestionsSnapshot * 100.
+  Se actualiza desde intentos
+  completados y deltas de mastery.
 end note
 
 @enduml

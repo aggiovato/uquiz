@@ -13,13 +13,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.uquiz.android.ui.designsystem.components.buttons.UButtonSize
+import com.uquiz.android.ui.designsystem.components.buttons.UFilledButton
 import com.uquiz.android.ui.designsystem.components.dialogs.UDialogScaffold
 import com.uquiz.android.ui.designsystem.components.feedback.UMarkdownText
 import com.uquiz.android.ui.designsystem.preview.UPreview
@@ -27,7 +28,7 @@ import com.uquiz.android.ui.designsystem.tokens.AppRadius
 import com.uquiz.android.ui.designsystem.tokens.BrandNavy
 import com.uquiz.android.ui.designsystem.tokens.Ink950
 import com.uquiz.android.ui.designsystem.tokens.Neutral200
-import com.uquiz.android.ui.designsystem.tokens.Teal500
+import com.uquiz.android.ui.designsystem.tokens.Teal700
 import com.uquiz.android.ui.designsystem.tokens.UIcons
 import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.i18n.LocalStrings
@@ -65,11 +66,14 @@ fun PreviewMarkdownDialog(
         headerColor = BrandNavy,
         headerIconRes = UIcons.Actions.See,
         decorativeTint = BrandNavy,
+        showDecorativeBackground = false,
         modifier = Modifier.heightIn(max = 560.dp),
         actions = {
-            TextButton(onClick = onDismiss) {
-                Text(strings.cancel)
-            }
+            UFilledButton(
+                text = strings.common.cancel,
+                size = UButtonSize.Compact,
+                onClick = onDismiss,
+            )
         },
     ) {
         Column(
@@ -84,17 +88,18 @@ fun PreviewMarkdownDialog(
 
             options.filter { it.markdown.isNotBlank() }.forEach { option ->
                 val isCorrect = option.isCorrect
-                val bg = if (isCorrect) Teal500 else Color.White
-                val border = if (isCorrect) Teal500 else Neutral200
+                val bg = if (isCorrect) Teal700 else Color.White
+                val border = if (isCorrect) Teal700 else Neutral200
                 val labelColor = if (isCorrect) Color.White else BrandNavy
                 val textColor = if (isCorrect) Color.White else Ink950
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(bg, RoundedCornerShape(AppRadius))
-                        .border(1.dp, border, RoundedCornerShape(AppRadius))
-                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(bg, RoundedCornerShape(AppRadius))
+                            .border(1.dp, border, RoundedCornerShape(AppRadius))
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -123,12 +128,13 @@ private fun PreviewMarkdownDialogPreview() {
         PreviewMarkdownDialog(
             title = "Question preview",
             markdown = "¿Qué **organela** celular se encarga de producir energía?",
-            options = listOf(
-                PreviewOptionUiModel("A.", "Núcleo", false),
-                PreviewOptionUiModel("B.", "Mitocondria", true),
-                PreviewOptionUiModel("C.", "Ribosoma", false),
-                PreviewOptionUiModel("D.", "Lisosoma", false),
-            ),
+            options =
+                listOf(
+                    PreviewOptionUiModel("A.", "Núcleo", false),
+                    PreviewOptionUiModel("B.", "Mitocondria", true),
+                    PreviewOptionUiModel("C.", "Ribosoma", false),
+                    PreviewOptionUiModel("D.", "Lisosoma", false),
+                ),
             onDismiss = {},
         )
     }

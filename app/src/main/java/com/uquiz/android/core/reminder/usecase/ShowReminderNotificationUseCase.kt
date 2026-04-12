@@ -2,7 +2,7 @@ package com.uquiz.android.core.reminder.usecase
 
 import android.content.Context
 import com.uquiz.android.core.database.DatabaseModule
-import com.uquiz.android.core.preferences.createUserPreferencesDataStore
+import com.uquiz.android.core.preferences.PreferencesModule
 import com.uquiz.android.core.reminder.builder.ReminderNotificationBuilder
 import com.uquiz.android.core.reminder.provider.ReminderNotificationContextProvider
 import com.uquiz.android.core.reminder.resolver.ReminderMessageResolver
@@ -33,7 +33,7 @@ class ShowReminderNotificationUseCase private constructor(
         fun create(context: Context): ShowReminderNotificationUseCase {
             val appContext = context.applicationContext
             val database = DatabaseModule.getDatabase(appContext)
-            val dataStore = createUserPreferencesDataStore(appContext)
+            val dataStore = PreferencesModule.getDataStore(appContext)
             val currentUserRepository = CurrentUserRepositoryImpl(dataStore)
             val userPreferencesRepository = UserPreferencesRepositoryImpl(dataStore)
             val userProfileRepository = UserProfileRepositoryImpl(
@@ -44,20 +44,25 @@ class ShowReminderNotificationUseCase private constructor(
                 database.attemptDao(),
                 database.attemptAnswerDao(),
                 database.attemptPackDao(),
-                currentUserRepository
+                database.attemptQuestionPlanDao(),
+                currentUserRepository,
             )
             val packRepository = PackRepositoryImpl(
                 database.packDao(),
                 database.folderDao(),
                 database.packQuestionDao()
             )
-            val userStatsRepository = UserStatsRepositoryImpl(
-                database.attemptDao(),
-                currentUserRepository
-            )
             val userRankRepository = UserRankRepositoryImpl(
                 database.userRankDao(),
-                currentUserRepository
+                currentUserRepository,
+            )
+            val userStatsRepository = UserStatsRepositoryImpl(
+                database.attemptDao(),
+                database.attemptAnswerDao(),
+                database.packStatsDao(),
+                database.questionStatsDao(),
+                userRankRepository,
+                currentUserRepository,
             )
 
             return ShowReminderNotificationUseCase(

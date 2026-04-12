@@ -138,7 +138,7 @@ private fun StudyIntroScreen(
                                 shadowElevation = 0.dp,
                             ) {
                                 Text(
-                                    text = strings.studyModeTitle,
+                                    text = strings.common.studyModeTitle,
                                     style = MaterialTheme.typography.labelLarge,
                                     color = Neutral100,
                                     modifier =
@@ -155,7 +155,7 @@ private fun StudyIntroScreen(
                                 color = Color.White,
                             )
                             Text(
-                                text = strings.studyReadyDescription,
+                                text = strings.studyIntro.studyReadyDescription,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White.copy(alpha = 0.78f),
                             )
@@ -181,7 +181,7 @@ private fun StudyIntroScreen(
                             ) {
                                 StudyMetricCard(
                                     value = uiState.questionCount.toString(),
-                                    label = strings.questionsStatLabel,
+                                    label = strings.common.questionsStatLabel,
                                     valueColor = Navy200,
                                     modifier =
                                         Modifier
@@ -192,7 +192,7 @@ private fun StudyIntroScreen(
                                     val (value, color) = studyDifficultyInfo(difficulty, strings)
                                     StudyMetricCard(
                                         value = value,
-                                        label = strings.studyAverageDifficultyLabel,
+                                        label = strings.common.studyAverageDifficultyLabel,
                                         valueColor = color,
                                         modifier =
                                             Modifier
@@ -205,7 +205,7 @@ private fun StudyIntroScreen(
                             if (uiState.hasActiveAttempt) {
                                 StudyInfoBanner(
                                     text =
-                                        strings.studyResumeProgress(
+                                        strings.studyIntro.studyResumeProgress(
                                             uiState.activeProgress,
                                             uiState.questionCount,
                                         ),
@@ -236,12 +236,12 @@ private fun StudyIntroScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         UDarkButton(
-                            text = if (uiState.hasActiveAttempt) strings.studyResumeStudy else strings.studyStartStudy,
+                            text = if (uiState.hasActiveAttempt) strings.studyIntro.studyResumeStudy else strings.studyIntro.studyStartStudy,
                             onClick = onStartOrResume,
                             enabled = uiState.questionCount > 0,
                         )
                         UDarkButton(
-                            text = strings.back,
+                            text = strings.common.back,
                             onClick = onBack,
                             variant = UDarkButtonVariant.Secondary,
                         )

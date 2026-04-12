@@ -31,7 +31,7 @@ import com.uquiz.android.domain.ranking.enums.UserRank
 data class UserRankState(
     val userId: String,
     val currentRank: UserRank = UserRank.INITIATE,
-    val mmr: Float = 1200f,
+    val mmr: Float = 600f,
     val perfEwma: Float = 0.5f,
     val lifetimeCorrect: Int = 0,
     val lifetimeIncorrect: Int = 0,

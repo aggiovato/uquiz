@@ -179,7 +179,7 @@ fun UActionsSheetFab(
                             primaryAction?.iconRes ?: UIcons.Actions.Settings
                         },
                     ),
-                contentDescription = if (isExpandable) strings.actionsLabel else primaryAction?.label,
+                contentDescription = if (isExpandable) strings.common.actionsLabel else primaryAction?.label,
                 modifier = Modifier.rotate(fabIconRotation),
             )
         }

@@ -28,9 +28,9 @@ fun DifficultySelector(
 ) {
     val strings = LocalStrings.current
     val items = listOf(
-        DifficultyLevel.EASY to strings.difficultyEasy,
-        DifficultyLevel.MEDIUM to strings.difficultyMedium,
-        DifficultyLevel.HARD to strings.difficultyHard,
+        DifficultyLevel.EASY to strings.common.difficultyEasy,
+        DifficultyLevel.MEDIUM to strings.common.difficultyMedium,
+        DifficultyLevel.HARD to strings.common.difficultyHard,
     )
 
     Row(

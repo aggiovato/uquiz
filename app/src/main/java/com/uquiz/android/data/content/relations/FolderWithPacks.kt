@@ -5,11 +5,7 @@ import androidx.room.Relation
 import com.uquiz.android.data.content.entity.FolderEntity
 import com.uquiz.android.data.content.entity.PackEntity
 
-/**
- * Room relation: Folder with its Packs
- *
- * Used for displaying folder contents (packs inside)
- */
+/** Relación Room: carpeta con sus packs. Usada para mostrar el contenido de una carpeta. */
 data class FolderWithPacks(
     @Embedded
     val folder: FolderEntity,

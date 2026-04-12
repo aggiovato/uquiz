@@ -5,11 +5,7 @@ import androidx.room.Relation
 import com.uquiz.android.data.attempts.entity.AttemptAnswerEntity
 import com.uquiz.android.data.attempts.entity.AttemptEntity
 
-/**
- * Room relation: Attempt with its Answers
- *
- * Used for displaying attempt results and statistics
- */
+/** Relación Room: intento con todas sus respuestas. Usada para calcular resultados y estadísticas. */
 data class AttemptWithAnswers(
     @Embedded
     val attempt: AttemptEntity,

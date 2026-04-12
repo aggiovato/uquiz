@@ -1,0 +1,46 @@
+@startuml use-cases-content-management
+
+left to right direction
+
+actor "Usuario local" as User
+actor "Storage local" as Storage
+actor "Import / Export" as IO
+
+rectangle "Content Management" {
+  usecase "Crear folder" as UC_CreateFolder
+  usecase "Editar folder" as UC_EditFolder
+  usecase "Borrar folder" as UC_DeleteFolder
+  usecase "Crear pack" as UC_CreatePack
+  usecase "Editar pack" as UC_EditPack
+  usecase "Borrar pack" as UC_DeletePack
+  usecase "Crear pregunta" as UC_CreateQuestion
+  usecase "Editar pregunta" as UC_EditQuestion
+  usecase "Borrar pregunta" as UC_DeleteQuestion
+  usecase "Importar contenido" as UC_Import
+  usecase "Exportar contenido" as UC_Export
+}
+
+User --> UC_CreateFolder
+User --> UC_EditFolder
+User --> UC_DeleteFolder
+User --> UC_CreatePack
+User --> UC_EditPack
+User --> UC_DeletePack
+User --> UC_CreateQuestion
+User --> UC_EditQuestion
+User --> UC_DeleteQuestion
+User --> UC_Import
+User --> UC_Export
+Storage --> UC_CreateFolder
+Storage --> UC_EditFolder
+Storage --> UC_DeleteFolder
+Storage --> UC_CreatePack
+Storage --> UC_EditPack
+Storage --> UC_DeletePack
+Storage --> UC_CreateQuestion
+Storage --> UC_EditQuestion
+Storage --> UC_DeleteQuestion
+IO --> UC_Import
+IO --> UC_Export
+
+@enduml

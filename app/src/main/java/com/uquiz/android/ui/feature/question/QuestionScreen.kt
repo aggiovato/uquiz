@@ -136,8 +136,8 @@ private fun QuestionScreen(
         add(
             UFabActionItem(
                 id = "save",
-                label = strings.save,
-                description = strings.saveActionDescription,
+                label = strings.common.save,
+                description = strings.common.saveActionDescription,
                 iconRes = UIcons.Actions.Edit,
                 enabled = uiState.canSave,
                 containerColor = Navy500,
@@ -148,8 +148,8 @@ private fun QuestionScreen(
         add(
             UFabActionItem(
                 id = "cancel",
-                label = strings.cancel,
-                description = strings.cancelActionDescription,
+                label = strings.common.cancel,
+                description = strings.common.cancelActionDescription,
                 iconRes = UIcons.Actions.Close,
                 containerColor = Neutral500,
                 contentColor = androidx.compose.ui.graphics.Color.White,
@@ -160,8 +160,8 @@ private fun QuestionScreen(
             add(
                 UFabActionItem(
                     id = "delete",
-                    label = strings.delete,
-                    description = strings.deleteQuestionActionDescription,
+                    label = strings.common.delete,
+                    description = strings.question.deleteQuestionActionDescription,
                     iconRes = UIcons.Actions.Delete,
                     kind = UFabActionKind.Destructive,
                     containerColor = com.uquiz.android.ui.designsystem.tokens.Red700,
@@ -186,10 +186,10 @@ private fun QuestionScreen(
                 verticalArrangement = Arrangement.spacedBy(22.dp)
             ) {
                 MarkdownEditorField(
-                    title = strings.questionMarkdownLabel,
+                    title = strings.question.questionMarkdownLabel,
                     value = uiState.questionMarkdown,
-                    placeholder = strings.questionMarkdownHint,
-                    previewLabel = strings.previewLabel,
+                    placeholder = strings.question.questionMarkdownHint,
+                    previewLabel = strings.common.previewLabel,
                     onValueChange = onQuestionMarkdownChange,
                     onPreviewClick = { showQuestionPreview = true }
                 )
@@ -207,7 +207,7 @@ private fun QuestionScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = strings.difficultySectionTitle,
+                        text = strings.question.difficultySectionTitle,
                         style = MaterialTheme.typography.titleSmall,
                         color = Neutral500
                     )
@@ -218,10 +218,10 @@ private fun QuestionScreen(
                 }
 
                 MarkdownEditorField(
-                    title = strings.explanationMarkdownLabel,
+                    title = strings.question.explanationMarkdownLabel,
                     value = uiState.explanationMarkdown,
-                    placeholder = strings.explanationMarkdownHint,
-                    previewLabel = strings.previewLabel,
+                    placeholder = strings.question.explanationMarkdownHint,
+                    previewLabel = strings.common.previewLabel,
                     onValueChange = onExplanationMarkdownChange,
                     onPreviewClick = { showExplanationPreview = true }
                 )
@@ -238,7 +238,7 @@ private fun QuestionScreen(
                             scope.launch {
                                 if (onSave()) {
                                     if (uiState.mode == QuestionMode.CREATE) {
-                                        toastController.show(strings.questionCreatedToast, UToastTone.Success)
+                                        toastController.show(strings.question.questionCreatedToast, UToastTone.Success)
                                     }
                                     onCancel()
                                 }
@@ -257,7 +257,7 @@ private fun QuestionScreen(
 
     if (showQuestionPreview) {
         PreviewMarkdownDialog(
-            title = strings.questionPreview,
+            title = strings.common.questionPreview,
             markdown = uiState.questionMarkdown,
             options = uiState.options
                 .filter { it.text.isNotBlank() }
@@ -274,7 +274,7 @@ private fun QuestionScreen(
 
     if (showExplanationPreview) {
         PreviewMarkdownDialog(
-            title = strings.explanationPreview,
+            title = strings.question.explanationPreview,
             markdown = uiState.explanationMarkdown,
             onDismiss = { showExplanationPreview = false }
         )
@@ -284,10 +284,10 @@ private fun QuestionScreen(
         SafeDeleteQuestionDialog(
             onDismiss = { showDeleteDialog = false },
             onConfirm = {
-                showDeleteDialog = false
                 scope.launch {
                     if (onDelete()) {
-                        toastController.show(strings.questionDeletedToast, UToastTone.Info)
+                        toastController.show(strings.question.questionDeletedToast, UToastTone.Info)
+                        showDeleteDialog = false
                         onCancel()
                     }
                 }

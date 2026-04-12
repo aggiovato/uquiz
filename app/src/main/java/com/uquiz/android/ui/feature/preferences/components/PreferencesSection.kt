@@ -9,19 +9,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.Ink950
 import com.uquiz.android.ui.designsystem.tokens.Neutral500
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 
 /**
- * ## PreferencesSection
- * Labelled content group used to partition the preferences screen.
+ * ### PreferencesSection
  *
- * Renders a bold title, an optional subtitle, and a vertically arranged content
- * slot. Spacing between sections is the caller's responsibility.
+ * Agrupa un bloque de contenido etiquetado dentro de la pantalla de preferencias.
  *
- * @param title Section heading shown in titleMedium style.
- * @param subtitle Optional muted description below the heading.
- * @param content Section body content.
+ * @param title Título principal de la sección.
+ * @param subtitle Subtítulo opcional con contexto adicional.
+ * @param content Contenido renderizado dentro de la sección.
  */
 @Composable
 fun PreferencesSection(
@@ -48,5 +48,18 @@ fun PreferencesSection(
             }
         }
         content()
+    }
+}
+
+@UPreview
+@Composable
+private fun PreferencesSectionPreview() {
+    UTheme {
+        PreferencesSection(
+            title = "Perfil",
+            subtitle = "Tu nombre y avatar",
+        ) {
+            Text("Contenido de ejemplo")
+        }
     }
 }

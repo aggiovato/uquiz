@@ -18,16 +18,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
- * Backing ViewModel for the preferences screen.
+ * ViewModel de la pantalla de preferencias.
  *
- * Combines the current user profile (display name, avatar) with the stored
- * preferences (theme, language, reminder settings) into a single [PreferencesUiState].
- * Preferences are edited through a local draft and only persisted when
- * [saveChanges] is called.
- *
- * Side effects (scheduling/cancelling the reminder alarm) are emitted via
- * [reminderSideEffect] so the composable can perform the platform call with a
- * Context while keeping the ViewModel free of Android framework dependencies.
+ * Combina el perfil actual y las preferencias persistidas en un único
+ * [PreferencesUiState]. Mantiene un borrador local para permitir edición
+ * diferida y expone side effects para el agendado del recordatorio.
  */
 class PreferencesViewModel(
     private val userProfileRepository: UserProfileRepository,
@@ -37,7 +32,7 @@ class PreferencesViewModel(
     private val _uiState = MutableStateFlow(PreferencesUiState())
     val uiState: StateFlow<PreferencesUiState> = _uiState.asStateFlow()
 
-    /** Emitted when the caller must schedule (true) or cancel (false) the reminder alarm. */
+    /** Flujo de acciones que delega en la UI la interacción con el programador de recordatorios. */
     private val _reminderSideEffect = MutableSharedFlow<ReminderAction>(extraBufferCapacity = 1)
     val reminderSideEffect: SharedFlow<ReminderAction> = _reminderSideEffect.asSharedFlow()
 
@@ -77,44 +72,55 @@ class PreferencesViewModel(
         }
     }
 
+    /** Actualiza el nombre visible del borrador actual. */
     fun updateDraftDisplayName(name: String) = updateDraft { copy(displayName = name) }
 
+    /** Actualiza el icono del avatar y fuerza la fuente de avatar a icono. */
     fun updateDraftAvatarIcon(icon: String?) = updateDraft {
         copy(avatarSource = AvatarSource.Icon, avatarIcon = icon)
     }
 
+    /** Actualiza la imagen del avatar usando una uri persistible. */
     fun updateDraftAvatarImage(uri: String?) = updateDraft {
         copy(avatarSource = AvatarSource.Image, avatarImageUri = uri)
     }
 
+    /** Limpia la imagen del avatar y vuelve el borrador al modo icono. */
     fun clearDraftAvatarImage() = updateDraft {
         copy(avatarSource = AvatarSource.Icon, avatarImageUri = null)
     }
 
+    /** Cambia explícitamente la fuente activa del avatar. */
     fun switchAvatarSource(source: AvatarSource) = updateDraft {
         copy(avatarSource = source)
     }
 
+    /** Actualiza el tema preferido en el borrador. */
     fun updateDraftThemeMode(mode: com.uquiz.android.domain.user.enums.AppThemeMode) = updateDraft {
         copy(themeMode = mode)
     }
 
+    /** Actualiza el idioma visible en el borrador. */
     fun updateDraftLanguage(code: String) = updateDraft {
         copy(languageCode = sanitizeLanguageCode(code))
     }
 
+    /** Activa o desactiva el recordatorio en el borrador. */
     fun updateDraftReminderEnabled(enabled: Boolean) = updateDraft {
         copy(reminderEnabled = enabled)
     }
 
+    /** Actualiza la hora objetivo del recordatorio. */
     fun updateDraftReminderTime(hour: Int, minute: Int) = updateDraft {
         copy(reminderHour = hour, reminderMinute = minute)
     }
 
+    /** Sustituye el conjunto completo de días seleccionados para el recordatorio. */
     fun updateDraftReminderDays(days: Set<String>) = updateDraft {
         copy(reminderDays = days)
     }
 
+    /** Descarta el borrador y restaura el último estado persistido. */
     fun discardChanges() {
         val persisted = _uiState.value.persisted
         _uiState.value = PreferencesUiState(
@@ -125,6 +131,7 @@ class PreferencesViewModel(
         )
     }
 
+    /** Persiste el borrador actual y emite el side effect de recordatorio si cambió su configuración. */
     fun saveChanges() {
         val current = _uiState.value
         if (current.isLoading || !current.hasPendingChanges) return
@@ -171,6 +178,7 @@ class PreferencesViewModel(
         )
     }
 
+    /** Factory que resuelve las dependencias requeridas por [PreferencesViewModel]. */
     class Factory(
         private val userProfileRepository: UserProfileRepository,
         private val userPreferencesRepository: UserPreferencesRepository
@@ -216,7 +224,7 @@ private fun sanitizeLanguageCode(code: String): String {
 private val VISIBLE_LANGUAGE_CODES = setOf("en", "es", "it", "ja")
 private const val DEFAULT_LANGUAGE_CODE = "en"
 
-/** Action emitted by [PreferencesViewModel] to ask the composable to interact with AlarmManager. */
+/** Acción emitida por [PreferencesViewModel] para coordinar el recordatorio con la capa UI. */
 sealed interface ReminderAction {
     data class Schedule(val hour: Int, val minute: Int) : ReminderAction
     data object Cancel : ReminderAction

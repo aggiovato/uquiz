@@ -2,7 +2,7 @@
 
 !include ../_styles.iuml
 
-title <size:16><b>Attempts Domain</b></size>\n<size:11><color:#60727F>Attempt · AttemptAnswer · AttemptPack</color></size>
+title <size:16><b>Attempts Domain</b></size>\n<size:11><color:#60727F>Attempt · AttemptAnswer · AttemptPack · AttemptQuestionPlan</color></size>
 
 entity "attempts" as Attempt <<attempts>> {
     PK(id)                  : TEXT
@@ -42,8 +42,22 @@ entity "attempt_packs" as AttemptPack <<join-attempts>> {
     PK(packId)          : TEXT
 }
 
+entity "questions" as Question <<content>> {
+    PK(id)              : TEXT
+}
+
+entity "attempt_question_plan" as AttemptPlan <<attempts>> {
+    PK(attemptId)       : TEXT
+    PK(questionId)      : TEXT
+    ==
+    orderIndex          : INTEGER NOT NULL
+    timeLimitMs         : INTEGER NOT NULL
+}
+
 Attempt     ||--|{  AttemptAnswer   : "attemptId / CASCADE"
 Attempt     ||--o{  AttemptPack    : "attemptId / CASCADE"
+AttemptPlan ..>     Attempt        : "attemptId (sin FK)"
+AttemptPlan ..>     Question       : "questionId (sin FK)"
 
 note right of Attempt
   userId sin FK —
@@ -56,6 +70,14 @@ note right of AttemptAnswer
   pickedOptionId = SET_NULL
   si la Option se elimina.
   NULL = timeout sin respuesta.
+end note
+
+note right of AttemptPlan
+  Congela el orden de preguntas
+  y el limite temporal de cada slot
+  en modo game.
+  La tabla existe en Room, pero
+  no declara FKs SQL.
 end note
 
 @enduml

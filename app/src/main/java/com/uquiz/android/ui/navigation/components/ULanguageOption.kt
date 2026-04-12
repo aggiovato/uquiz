@@ -18,8 +18,8 @@ data class ULanguageOption(
 
 /** Lista de idiomas disponibles para los selectores de la app. */
 val uAppLanguages = listOf(
-    ULanguageOption("en", { it.langEnglish }, UIcons.Flags.English),
-    ULanguageOption("es", { it.langSpanish }, UIcons.Flags.Spanish),
-    ULanguageOption("it", { it.langItalian }, UIcons.Flags.Italian),
-    ULanguageOption("ja", { it.langJapanese }, UIcons.Flags.Japanese),
+    ULanguageOption("en", { it.preferences.langEnglish }, UIcons.Flags.English),
+    ULanguageOption("es", { it.preferences.langSpanish }, UIcons.Flags.Spanish),
+    ULanguageOption("it", { it.preferences.langItalian }, UIcons.Flags.Italian),
+    ULanguageOption("ja", { it.preferences.langJapanese }, UIcons.Flags.Japanese),
 )

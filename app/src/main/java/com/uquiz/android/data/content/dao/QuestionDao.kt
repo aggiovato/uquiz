@@ -10,6 +10,11 @@ import com.uquiz.android.data.content.relations.OrderedQuestionWithOptions
 import com.uquiz.android.data.content.relations.QuestionWithOptions
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * ### QuestionDao
+ *
+ * Acceso reactivo y puntual a la tabla `questions` y sus opciones de respuesta.
+ */
 @Dao
 interface QuestionDao {
 
@@ -25,33 +30,21 @@ interface QuestionDao {
     @Query("SELECT 0 as position, q.* FROM questions q WHERE q.id = :id")
     fun observeQuestionWithOptions(id: String): Flow<List<OrderedQuestionWithOptions>>
 
-    /**
-     * Get question with options
-     */
     @Transaction
     @Query("SELECT * FROM questions WHERE id = :questionId")
     suspend fun getQuestionWithOptions(questionId: String): QuestionWithOptions?
 
-    /**
-     * Observe question with options
-     */
     @Transaction
     @Query("SELECT * FROM questions WHERE id = :questionId")
     fun observeQuestionWithOptionsFlow(questionId: String): Flow<QuestionWithOptions?>
 
-    /**
-     * Get question by ID
-     */
     @Query("SELECT * FROM questions WHERE id = :questionId")
     suspend fun getById(questionId: String): QuestionEntity?
 
     @Query("SELECT * FROM questions WHERE id IN (:questionIds)")
     suspend fun getByIds(questionIds: List<String>): List<QuestionEntity>
 
-    /**
-     * Delete question (will cascade to options and pack_questions)
-     */
+    /** Elimina la pregunta en cascada (opciones y entradas de `pack_questions` incluidas). */
     @Query("DELETE FROM questions WHERE id = :id")
     suspend fun deleteById(id: String)
-
 }

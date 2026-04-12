@@ -2,11 +2,13 @@ package com.uquiz.android.ui.feature.preferences.model
 
 import com.uquiz.android.domain.user.enums.AppThemeMode
 
+/** Fuente elegida para representar el avatar del usuario en preferencias. */
 enum class AvatarSource {
     Icon,
     Image
 }
 
+/** Estado editable de preferencias antes de persistir los cambios. */
 data class PreferencesEditableState(
     val displayName: String = "",
     val avatarSource: AvatarSource = AvatarSource.Icon,

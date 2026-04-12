@@ -1,0 +1,30 @@
+package com.uquiz.android.ui.i18n.model
+
+/** Textos exclusivos de la pantalla de estadísticas de usuario (UserStatsScreen y sus componentes). */
+data class UserStatsStrings(
+    val title: String,
+    val subtitle: String,
+    val bannerLine1: String,
+    val bannerLine2: String,
+    val bannerLine3: String,
+    val allFilter: String,
+    val last7DaysFilter: String,
+    val last30DaysFilter: String,
+    val answeredQuestions: String,
+    val totalTime: String,
+    val averageAnswerTime: String,
+    val packsProgress: String,
+    val modePerformance: String,
+    val bestGameScore: String,
+    val averageGameScore: String,
+    val masteredQuestions: String,
+    val accuracyTrend: String,
+    val packBars: String,
+    val answerSplit: String,
+    val difficultyPerformance: String,
+    val questionInsights: String,
+    val fastestQuestion: String,
+    val mostFailedQuestion: String,
+    val noData: String,
+    val packBarsDescription: String,
+)

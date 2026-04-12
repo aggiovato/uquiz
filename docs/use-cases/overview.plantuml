@@ -1,0 +1,35 @@
+@startuml use-cases-overview
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Usuario local" as User
+actor "Android OS" as OS
+actor "Storage local" as Storage
+actor "Import / Export" as IO
+
+rectangle "UQuiz MVP" {
+  usecase "Gestionar biblioteca" as UC_Content
+  usecase "Practicar en study" as UC_Study
+  usecase "Competir en game" as UC_Game
+  usecase "Consultar stats y ranking" as UC_Stats
+  usecase "Gestionar perfil y preferencias" as UC_Prefs
+  usecase "Recibir recordatorios" as UC_Reminders
+  usecase "Importar / exportar contenido" as UC_IO
+}
+
+User --> UC_Content
+User --> UC_Study
+User --> UC_Game
+User --> UC_Stats
+User --> UC_Prefs
+User --> UC_IO
+OS --> UC_Reminders
+Storage --> UC_Content
+Storage --> UC_Study
+Storage --> UC_Game
+Storage --> UC_Stats
+Storage --> UC_Prefs
+IO --> UC_IO
+
+@enduml

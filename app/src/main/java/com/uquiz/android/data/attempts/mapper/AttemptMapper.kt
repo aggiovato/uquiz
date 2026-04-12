@@ -1,16 +1,16 @@
 package com.uquiz.android.data.attempts.mapper
 
 import com.uquiz.android.data.attempts.entity.AttemptEntity
-import com.uquiz.android.data.local.db.AuditTimestamps
+import com.uquiz.android.data.local.db.model.AuditTimestamps
 import com.uquiz.android.domain.attempts.model.Attempt
 
 /**
- * Mapper: AttemptEntity <-> Attempt (domain model)
+ * Mapeo bidireccional entre [com.uquiz.android.data.attempts.entity.AttemptEntity] y
+ * [com.uquiz.android.domain.attempts.model.Attempt].
  */
-object AttemptMapper {
-
-    fun toEntity(attempt: Attempt): AttemptEntity {
-        return AttemptEntity(
+internal object AttemptMapper {
+    fun toEntity(attempt: Attempt): AttemptEntity =
+        AttemptEntity(
             id = attempt.id,
             userId = attempt.userId,
             mode = attempt.mode,
@@ -23,15 +23,15 @@ object AttemptMapper {
             totalQuestions = attempt.totalQuestions,
             correctAnswers = attempt.correctAnswers,
             currentQuestionIndex = attempt.currentQuestionIndex,
-            audit = AuditTimestamps(
-                createdAt = attempt.createdAt,
-                updatedAt = attempt.updatedAt
-            )
+            audit =
+                AuditTimestamps(
+                    createdAt = attempt.createdAt,
+                    updatedAt = attempt.updatedAt,
+                ),
         )
-    }
 
-    fun toModel(entity: AttemptEntity): Attempt {
-        return Attempt(
+    fun toModel(entity: AttemptEntity): Attempt =
+        Attempt(
             id = entity.id,
             userId = entity.userId,
             mode = entity.mode,
@@ -45,15 +45,10 @@ object AttemptMapper {
             correctAnswers = entity.correctAnswers,
             currentQuestionIndex = entity.currentQuestionIndex,
             createdAt = entity.audit.createdAt,
-            updatedAt = entity.audit.updatedAt
+            updatedAt = entity.audit.updatedAt,
         )
-    }
 
-    fun toModelList(entities: List<AttemptEntity>): List<Attempt> {
-        return entities.map { toModel(it) }
-    }
+    fun toModelList(entities: List<AttemptEntity>): List<Attempt> = entities.map { toModel(it) }
 
-    fun toEntityList(attempts: List<Attempt>): List<AttemptEntity> {
-        return attempts.map { toEntity(it) }
-    }
+    fun toEntityList(attempts: List<Attempt>): List<AttemptEntity> = attempts.map { toEntity(it) }
 }

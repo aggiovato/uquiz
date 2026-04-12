@@ -1,0 +1,36 @@
+@startuml use-cases-preferences-and-device
+
+left to right direction
+
+actor "Usuario local" as User
+actor "Android OS" as OS
+actor "Storage local" as Storage
+
+rectangle "Preferences and Device" {
+  usecase "Editar display name" as UC_Name
+  usecase "Elegir avatar" as UC_Avatar
+  usecase "Eliminar avatar" as UC_DeleteAvatar
+  usecase "Cambiar idioma" as UC_Language
+  usecase "Cambiar tema" as UC_Theme
+  usecase "Configurar reminder" as UC_Reminder
+  usecase "Recibir notificacion local" as UC_Notify
+  usecase "Consultar about the app\n(objetivo MVP)" as UC_About
+}
+
+User --> UC_Name
+User --> UC_Avatar
+User --> UC_DeleteAvatar
+User --> UC_Language
+User --> UC_Theme
+User --> UC_Reminder
+User --> UC_About
+Storage --> UC_Name
+Storage --> UC_Avatar
+Storage --> UC_DeleteAvatar
+Storage --> UC_Language
+Storage --> UC_Theme
+Storage --> UC_Reminder
+OS --> UC_Notify
+UC_Reminder --> UC_Notify : <<trigger>>
+
+@enduml

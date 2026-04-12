@@ -6,6 +6,11 @@ import androidx.room.Upsert
 import com.uquiz.android.data.ranking.entity.UserRankEntity
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * ### UserRankDao
+ *
+ * Acceso reactivo y puntual a la tabla `user_rank` (estado MMR y XP del usuario).
+ */
 @Dao
 interface UserRankDao {
 

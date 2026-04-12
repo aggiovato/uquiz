@@ -24,11 +24,11 @@ fun SafeDeleteQuestionDialog(
     val strings = LocalStrings.current
 
     SafeDeleteEntityDialog(
-        title = strings.deleteQuestionTitle,
-        primaryMessage = strings.deleteQuestionPrimaryMessage,
-        secondaryMessage = strings.deleteQuestionSecondaryMessage,
-        requiredKeyword = strings.deleteQuestionKeyword,
-        keywordInstruction = strings.deleteQuestionTypeKeywordInstruction(strings.deleteQuestionKeyword),
+        title = strings.question.deleteQuestionTitle,
+        primaryMessage = strings.question.deleteQuestionPrimaryMessage,
+        secondaryMessage = strings.question.deleteQuestionSecondaryMessage,
+        requiredKeyword = strings.question.deleteQuestionKeyword,
+        keywordInstruction = strings.question.deleteQuestionTypeKeywordInstruction(strings.question.deleteQuestionKeyword),
         headerIconRes = UIcons.Actions.Delete,
         onDismiss = onDismiss,
         onConfirm = onConfirm,

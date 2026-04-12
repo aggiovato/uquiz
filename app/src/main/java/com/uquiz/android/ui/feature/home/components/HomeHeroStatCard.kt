@@ -23,9 +23,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.Neutral100
 import com.uquiz.android.ui.designsystem.tokens.URadius
+import com.uquiz.android.ui.designsystem.tokens.UTheme
+import com.uquiz.android.ui.designsystem.tokens.UIcons
+import com.uquiz.android.ui.designsystem.tokens.Navy500
+import com.uquiz.android.ui.designsystem.tokens.Orange500
 
+/**
+ * ### HomeHeroStatCard
+ *
+ * Tarjeta destacada de métrica principal en la cabecera de Home.
+ *
+ * @param value Valor principal que se quiere destacar.
+ * @param label Etiqueta descriptiva de la métrica.
+ * @param iconRes Recurso del icono asociado.
+ * @param containerColor Color de fondo de la tarjeta.
+ * @param iconTint Color aplicado al icono dentro del badge.
+ */
 @Composable
 fun HomeHeroStatCard(
     value: String,
@@ -74,5 +90,19 @@ fun HomeHeroStatCard(
                 fontWeight = FontWeight.SemiBold
             )
         }
+    }
+}
+
+@UPreview
+@Composable
+private fun HomeHeroStatCardPreview() {
+    UTheme {
+        HomeHeroStatCard(
+            value = "240",
+            label = "Puntos totales",
+            iconRes = UIcons.Menu.Stats,
+            containerColor = Navy500,
+            iconTint = Orange500,
+        )
     }
 }

@@ -1,0 +1,31 @@
+@startuml use-cases-stats-and-ranking
+
+left to right direction
+
+actor "Usuario local" as User
+actor "Storage local" as Storage
+
+rectangle "Stats and Ranking" {
+  usecase "Consultar pack stats" as UC_PackStats
+  usecase "Consultar ayuda de pack stats" as UC_PackHelp
+  usecase "Consultar user stats" as UC_UserStats
+  usecase "Filtrar por modo" as UC_FilterMode
+  usecase "Filtrar por periodo" as UC_FilterPeriod
+  usecase "Consultar ranking y progreso" as UC_Ranking
+  usecase "Consultar ayuda de user stats\n(objetivo MVP)" as UC_UserHelp
+}
+
+User --> UC_PackStats
+User --> UC_PackHelp
+User --> UC_UserStats
+User --> UC_FilterMode
+User --> UC_FilterPeriod
+User --> UC_Ranking
+User --> UC_UserHelp
+Storage --> UC_PackStats
+Storage --> UC_UserStats
+Storage --> UC_Ranking
+UC_UserStats --> UC_FilterMode : <<include>>
+UC_UserStats --> UC_FilterPeriod : <<include>>
+
+@enduml

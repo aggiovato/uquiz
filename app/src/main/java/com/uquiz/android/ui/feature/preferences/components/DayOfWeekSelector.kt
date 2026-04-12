@@ -16,22 +16,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.Navy300
 import com.uquiz.android.ui.designsystem.tokens.Navy500
 import com.uquiz.android.ui.designsystem.tokens.Neutral100
 import com.uquiz.android.ui.designsystem.tokens.Neutral400
+import com.uquiz.android.ui.designsystem.tokens.UTheme
 import com.uquiz.android.ui.i18n.LocalStrings
 
 /**
- * ## DayOfWeekSelector
- * 7-pill selector that lets the user toggle individual days for a recurring reminder.
+ * ### DayOfWeekSelector
  *
- * Days are represented as 3-letter abbreviation strings (e.g. `"MON"`, `"TUE"`).
- * Selected days are highlighted in navy; unselected days use a muted neutral style.
+ * Selector de días para configurar la repetición semanal del recordatorio.
  *
- * @param selectedDays Currently selected day keys.
- * @param onToggle Callback invoked with the toggled day key. The caller is responsible
- *   for adding or removing the key from the set.
+ * @param selectedDays Conjunto actual de claves de día seleccionadas.
+ * @param onToggle Acción invocada al alternar un día concreto.
  */
 @Composable
 fun DayOfWeekSelector(
@@ -41,13 +40,13 @@ fun DayOfWeekSelector(
     val strings = LocalStrings.current
     val dayKeys =
         listOf(
-            "MON" to strings.dayShortMon,
-            "TUE" to strings.dayShortTue,
-            "WED" to strings.dayShortWed,
-            "THU" to strings.dayShortThu,
-            "FRI" to strings.dayShortFri,
-            "SAT" to strings.dayShortSat,
-            "SUN" to strings.dayShortSun,
+            "MON" to strings.preferences.dayShortMon,
+            "TUE" to strings.preferences.dayShortTue,
+            "WED" to strings.preferences.dayShortWed,
+            "THU" to strings.preferences.dayShortThu,
+            "FRI" to strings.preferences.dayShortFri,
+            "SAT" to strings.preferences.dayShortSat,
+            "SUN" to strings.preferences.dayShortSun,
         )
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -82,5 +81,16 @@ fun DayOfWeekSelector(
                 )
             }
         }
+    }
+}
+
+@UPreview
+@Composable
+private fun DayOfWeekSelectorPreview() {
+    UTheme {
+        DayOfWeekSelector(
+            selectedDays = setOf("MON", "WED", "FRI"),
+            onToggle = {},
+        )
     }
 }

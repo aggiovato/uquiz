@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -27,6 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -42,8 +45,10 @@ import com.uquiz.android.ui.designsystem.tokens.Ink950
 import com.uquiz.android.ui.designsystem.tokens.Neutral300
 import com.uquiz.android.ui.designsystem.tokens.Neutral400
 import com.uquiz.android.ui.designsystem.tokens.Neutral700
+import com.uquiz.android.ui.designsystem.tokens.Teal200
 import com.uquiz.android.ui.designsystem.tokens.Red700
 import com.uquiz.android.ui.designsystem.tokens.Teal700
+import com.uquiz.android.ui.designsystem.tokens.Teal900
 import com.uquiz.android.ui.designsystem.tokens.UIcons
 import com.uquiz.android.ui.designsystem.tokens.UTheme
 
@@ -77,13 +82,13 @@ fun OptionsEditorSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = strings.optionsSectionTitle,
+                text = strings.question.optionsSectionTitle,
                 style = MaterialTheme.typography.titleSmall,
                 color = Neutral700,
             )
             UToggleChip(
                 iconRes = UIcons.Actions.Add,
-                label = strings.addOption,
+                label = strings.question.addOption,
                 isActive = true,
                 onClick = onAddOption,
             )
@@ -93,7 +98,7 @@ fun OptionsEditorSection(
         options.forEachIndexed { index, option ->
             EditableOptionCard(
                 option = option,
-                placeholder = strings.optionPlaceholder(index),
+                placeholder = strings.question.optionPlaceholder(index),
                 onValueChange = { onOptionTextChange(option.id, it) },
                 onSelect = { onOptionSelected(option.id) },
                 onDelete = { onRemoveOption(option.id) },
@@ -157,7 +162,7 @@ private fun EditableOptionCard(
                     if (option.isCorrect) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = strings.correctOptionLabel,
+                            contentDescription = strings.question.correctOptionLabel,
                             tint = Teal700,
                             modifier = Modifier.size(12.dp),
                         )
@@ -189,20 +194,20 @@ private fun EditableOptionCard(
                 }
             }
 
-            // "Correct" badge overlaid at top-end of the card
+            // Chip de "Correcto" que desborda la esquina superior derecha de la tarjeta,
+            // con rotación y color sólido naranja — espejo visual del chip de dificultad.
             if (option.isCorrect) {
                 Text(
-                    text = strings.correctOptionLabel,
+                    text = strings.question.correctOptionLabel,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Teal900,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 2.dp, end = 2.dp)
-                        .background(
-                            color = Color.White.copy(alpha = 0.20f),
-                            shape = RoundedCornerShape(20.dp),
-                        )
-                        .padding(horizontal = 6.dp, vertical = 2.dp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White,
+                        .offset(x = 6.dp, y = (-6).dp)
+                        .rotate(8f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .drawBehind { drawRect(Teal200) }
+                        .padding(horizontal = 10.dp, vertical = 3.dp),
                 )
             }
         }
@@ -210,7 +215,7 @@ private fun EditableOptionCard(
         // Delete button — solid red
         UIconActionButton(
             iconRes = UIcons.Actions.Delete,
-            contentDescription = strings.delete,
+            contentDescription = strings.common.delete,
             onClick = onDelete,
             enabled = canDelete,
             containerColor = Red700,

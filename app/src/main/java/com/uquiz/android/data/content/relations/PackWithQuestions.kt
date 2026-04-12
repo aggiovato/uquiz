@@ -7,11 +7,7 @@ import com.uquiz.android.data.content.entity.PackEntity
 import com.uquiz.android.data.content.entity.PackQuestionEntity
 import com.uquiz.android.data.content.entity.QuestionEntity
 
-/**
- * Room relation: Pack with its Questions (through junction table)
- *
- * Used for loading a pack's complete question set
- */
+/** Relación Room: pack con todas sus preguntas (vía tabla de unión `pack_questions`). */
 data class PackWithQuestions(
     @Embedded
     val pack: PackEntity,

@@ -5,8 +5,14 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.uquiz.android.data.local.db.AuditTimestamps
+import com.uquiz.android.data.local.db.model.AuditTimestamps
 
+/**
+ * Fila de la tabla `folders`. Representa una carpeta que agrupa packs.
+ * El campo [parentId] es `null` para carpetas raíz; no nulo para subcarpetas.
+ *
+ * @see com.uquiz.android.domain.content.model.Folder
+ */
 @Entity(
     tableName = "folders",
     foreignKeys = [
@@ -14,10 +20,10 @@ import com.uquiz.android.data.local.db.AuditTimestamps
             entity = FolderEntity::class,
             parentColumns = ["id"],
             childColumns = ["parentId"],
-            onDelete = ForeignKey.CASCADE
-        )
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
-    indices = [Index("parentId")]
+    indices = [Index("parentId")],
 )
 data class FolderEntity(
     @PrimaryKey
@@ -27,5 +33,5 @@ data class FolderEntity(
     val colorHex: String? = null,
     val icon: String? = null,
     @Embedded
-    val audit: AuditTimestamps = AuditTimestamps()
+    val audit: AuditTimestamps = AuditTimestamps(),
 )

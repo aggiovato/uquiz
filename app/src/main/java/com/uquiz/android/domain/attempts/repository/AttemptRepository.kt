@@ -3,6 +3,7 @@ package com.uquiz.android.domain.attempts.repository
 import com.uquiz.android.domain.attempts.enums.AttemptMode
 import com.uquiz.android.domain.attempts.model.Attempt
 import com.uquiz.android.domain.attempts.model.AttemptAnswer
+import com.uquiz.android.domain.attempts.model.AttemptQuestionPlan
 import com.uquiz.android.domain.attempts.projection.ActivePackProgress
 import kotlinx.coroutines.flow.Flow
 
@@ -49,6 +50,8 @@ interface AttemptRepository {
      * - getWithAnswers(attemptId)
      * - getIncomplete()
      * - getActiveStudyAttempt(packId)
+     * - getActiveGameAttempt(packId)
+     * - getQuestionPlan(attemptId)
      * - getAnswers(attemptId)
      * - getRecentCompleted(limit)
      * - getAverageScore(mode)
@@ -61,6 +64,10 @@ interface AttemptRepository {
     suspend fun getIncomplete(): List<Attempt>
 
     suspend fun getActiveStudyAttempt(packId: String): Attempt?
+
+    suspend fun getActiveGameAttempt(packId: String): Attempt?
+
+    suspend fun getQuestionPlan(attemptId: String): List<AttemptQuestionPlan>
 
     suspend fun getAnswers(attemptId: String): List<AttemptAnswer>
 
@@ -80,6 +87,8 @@ interface AttemptRepository {
      * - completeAttempt(attemptId, score, correctAnswers, totalQuestions, durationMs)
      * - abandonAttempt(attemptId)
      * - recordAnswer(attemptId, questionId, pickedOptionId, isCorrect, timeMs, timeLimitMs)
+     * - saveQuestionPlan(plan)
+     * - deleteQuestionPlan(attemptId)
      * - deleteAttempt(attemptId)
      * - deleteOlderThan(beforeTimestamp)
      */
@@ -120,6 +129,10 @@ interface AttemptRepository {
         timeMs: Long,
         timeLimitMs: Long? = null,
     ): AttemptAnswer
+
+    suspend fun saveQuestionPlan(plan: List<AttemptQuestionPlan>)
+
+    suspend fun deleteQuestionPlan(attemptId: String)
 
     suspend fun deleteAttempt(attemptId: String)
 

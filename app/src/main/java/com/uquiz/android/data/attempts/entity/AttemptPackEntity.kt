@@ -5,6 +5,10 @@ import androidx.room.ForeignKey
 import com.uquiz.android.data.content.entity.PackEntity
 import androidx.room.Index
 
+/**
+ * Fila de la tabla de unión `attempt_packs`. Registra qué packs fueron incluidos
+ * en un intento de tipo Game (permite sesiones multi-pack).
+ */
 @Entity(
     tableName = "attempt_packs",
     primaryKeys = ["attemptId", "packId"],

@@ -52,7 +52,7 @@ fun StudySessionHeader(
         ) {
             UDarkIconButton(
                 iconRes = UIcons.Actions.Leave,
-                contentDescription = strings.studyExitStudy,
+                contentDescription = strings.studySession.studyExitStudy,
                 onClick = onExit,
             )
             Column(
@@ -72,7 +72,7 @@ fun StudySessionHeader(
             }
             UDarkIconButton(
                 iconRes = UIcons.Select.Idea,
-                contentDescription = strings.studyExplanationLabel,
+                contentDescription = strings.studySession.studyExplanationLabel,
                 onClick = onExplanation,
                 enabled = hasExplanation,
             )

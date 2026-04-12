@@ -67,7 +67,7 @@ fun CreateFolderDialog(
         headerIconRes = UIcons.Content.Folder.Add,
         actions = {
             UTextButton(
-                text = strings.cancel,
+                text = strings.common.cancel,
                 onClick = onDismiss,
             )
             Spacer(Modifier.width(12.dp))
@@ -88,7 +88,7 @@ fun CreateFolderDialog(
         UTextField(
             value = name,
             onValueChange = { name = it },
-            placeholder = strings.folderNameHint,
+            placeholder = strings.common.folderNameHint,
             capitalization = KeyboardCapitalization.Words,
             maxLength = CONTENT_NAME_MAX_LENGTH,
         )
@@ -96,7 +96,7 @@ fun CreateFolderDialog(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = strings.folderColorLabel,
+            text = strings.common.folderColorLabel,
             style = MaterialTheme.typography.labelMedium,
             color = Neutral500,
         )
@@ -110,7 +110,7 @@ fun CreateFolderDialog(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = strings.folderIconLabel,
+            text = strings.common.folderIconLabel,
             style = MaterialTheme.typography.labelMedium,
             color = Neutral500,
         )

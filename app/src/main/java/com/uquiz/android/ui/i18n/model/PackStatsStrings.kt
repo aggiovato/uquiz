@@ -1,0 +1,32 @@
+package com.uquiz.android.ui.i18n.model
+
+/** Textos exclusivos de la pantalla de estadísticas de pack y su hoja de ayuda. */
+data class PackStatsStrings(
+    val packStatsTitle: String,
+    val packLastSessionLabel: String,
+    val packMostUsedModeLabel: String,
+    val packSeeFullStats: String,
+    val packGeneralSummary: String,
+    val packByMode: String,
+    val packRecentActivity: String,
+    val packSeeAll: String,
+    val packBestPerformance: String,
+    val packNoSessionsYet: String,
+    val packNoGameSessionsYet: String,
+    val packNoStudySessionsYet: String,
+    val packQuestionsDominated: (Int, Int) -> String,
+    val packThisWeekLabel: (Int) -> String,
+    val packStatsHelpAction: String,
+    val packStatsHelpTitle: String,
+    val packStatsHelpIntro: String,
+    val packStatsHelpQuestions: String,
+    val packStatsHelpAccuracy: String,
+    val packStatsHelpSessions: String,
+    val packStatsHelpProgress: String,
+    val packStatsHelpAverageTime: String,
+    val packStatsHelpLastSession: String,
+    val packStatsHelpMostUsedMode: String,
+    val packStatsHelpBestPerformance: String,
+    val packStatsHelpMasteryTitle: String,
+    val packStatsHelpMastery: String,
+)

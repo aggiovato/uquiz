@@ -224,6 +224,9 @@ object UIcons {
 
         @DrawableRes
         val Trophy: Int = R.drawable.uic_card_trophy
+
+        @DrawableRes
+        val Coins: Int = R.drawable.uic_card_coins
     }
 
     /**

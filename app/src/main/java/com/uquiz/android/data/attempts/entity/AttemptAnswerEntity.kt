@@ -7,8 +7,14 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.uquiz.android.data.content.entity.OptionEntity
 import com.uquiz.android.data.content.entity.QuestionEntity
-import com.uquiz.android.data.local.db.AuditTimestamps
+import com.uquiz.android.data.local.db.model.AuditTimestamps
 
+/**
+ * Fila de la tabla `attempt_answers`. Registra la respuesta del usuario a una pregunta
+ * dentro de un intento, incluyendo la opción elegida, el resultado y el tiempo empleado.
+ *
+ * @see com.uquiz.android.domain.attempts.model.AttemptAnswer
+ */
 @Entity(
     tableName = "attempt_answers",
     foreignKeys = [
@@ -16,22 +22,22 @@ import com.uquiz.android.data.local.db.AuditTimestamps
             entity = AttemptEntity::class,
             parentColumns = ["id"],
             childColumns = ["attemptId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = QuestionEntity::class,
             parentColumns = ["id"],
             childColumns = ["questionId"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
             entity = OptionEntity::class,
             parentColumns = ["id"],
             childColumns = ["pickedOptionId"],
-            onDelete = ForeignKey.SET_NULL
-        )
+            onDelete = ForeignKey.SET_NULL,
+        ),
     ],
-    indices = [Index("attemptId"), Index("questionId"), Index("pickedOptionId")]
+    indices = [Index("attemptId"), Index("questionId"), Index("pickedOptionId")],
 )
 data class AttemptAnswerEntity(
     @PrimaryKey
@@ -43,5 +49,5 @@ data class AttemptAnswerEntity(
     val timeMs: Long,
     val timeLimitMs: Long? = null,
     @Embedded
-    val audit: AuditTimestamps = AuditTimestamps()
+    val audit: AuditTimestamps = AuditTimestamps(),
 )

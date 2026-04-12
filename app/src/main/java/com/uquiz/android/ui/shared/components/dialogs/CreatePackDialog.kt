@@ -73,7 +73,7 @@ fun CreatePackDialog(
         headerIconRes = UIcons.Content.Pack.Add,
         actions = {
             UTextButton(
-                text = strings.cancel,
+                text = strings.common.cancel,
                 onClick = onDismiss,
             )
             Spacer(Modifier.width(12.dp))
@@ -103,7 +103,7 @@ fun CreatePackDialog(
         UTextField(
             value = packTitle,
             onValueChange = { packTitle = it },
-            placeholder = strings.packTitleHint,
+            placeholder = strings.common.packTitleHint,
             capitalization = KeyboardCapitalization.Words,
             maxLength = CONTENT_NAME_MAX_LENGTH,
         )
@@ -111,7 +111,7 @@ fun CreatePackDialog(
         Spacer(Modifier.height(16.dp))
 
         Text(
-            text = strings.packDescriptionLabel,
+            text = strings.common.packDescriptionLabel,
             style = MaterialTheme.typography.labelMedium,
             color = Neutral500,
         )
@@ -120,14 +120,14 @@ fun CreatePackDialog(
         UTextArea(
             value = packDescription,
             onValueChange = { packDescription = it },
-            placeholder = strings.packDescriptionHint,
+            placeholder = strings.common.packDescriptionHint,
             maxLength = PACK_DESCRIPTION_MAX_LENGTH,
         )
 
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = strings.packColorLabel,
+            text = strings.common.packColorLabel,
             style = MaterialTheme.typography.labelMedium,
             color = Neutral500,
         )
@@ -142,7 +142,7 @@ fun CreatePackDialog(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = strings.packIconLabel,
+            text = strings.common.packIconLabel,
             style = MaterialTheme.typography.labelMedium,
             color = Neutral500,
         )

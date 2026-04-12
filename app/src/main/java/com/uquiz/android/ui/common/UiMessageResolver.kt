@@ -22,7 +22,7 @@ import com.uquiz.android.domain.importexport.error.InvalidImportRootShapeExcepti
 import com.uquiz.android.domain.importexport.error.InvalidUQuizContentException
 import com.uquiz.android.domain.importexport.error.InvalidUQuizFormatException
 import com.uquiz.android.domain.importexport.error.MissingRootFolderForLibraryImportException
-import com.uquiz.android.ui.i18n.AppErrors
+import com.uquiz.android.ui.i18n.model.AppErrors
 
 /**
  * Traduce cualquier excepción de dominio en un mensaje localizado listo para mostrarse al usuario.

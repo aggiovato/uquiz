@@ -50,64 +50,64 @@ fun PackStatsHelpRoute(modifier: Modifier = Modifier) {
             iconRes = UIcons.Cards.Question,
             iconTint = Navy500,
             circleColor = Navy100,
-            title = strings.questionsStatLabel,
-            body = strings.packStatsHelpQuestions
+            title = strings.common.questionsStatLabel,
+            body = strings.statsPack.packStatsHelpQuestions
         ),
         HelpTopic(
             iconRes = UIcons.Cards.Check,
             iconTint = Teal700,
             circleColor = Teal100,
-            title = strings.accuracyStatLabel,
-            body = strings.packStatsHelpAccuracy
+            title = strings.common.accuracyStatLabel,
+            body = strings.statsPack.packStatsHelpAccuracy
         ),
         HelpTopic(
             iconRes = UIcons.Cards.Session,
             iconTint = Gold700,
             circleColor = Gold100,
-            title = strings.sessionsStatLabel,
-            body = strings.packStatsHelpSessions
+            title = strings.common.sessionsStatLabel,
+            body = strings.statsPack.packStatsHelpSessions
         ),
         HelpTopic(
             iconRes = UIcons.Cards.Progress,
             iconTint = Orange700,
             circleColor = Orange100,
-            title = strings.progressLabel,
-            body = strings.packStatsHelpProgress
+            title = strings.common.progressLabel,
+            body = strings.statsPack.packStatsHelpProgress
         ),
         HelpTopic(
             iconRes = UIcons.Cards.Clock,
             iconTint = Gold700,
             circleColor = Gold100,
-            title = strings.averageTimeStatLabel,
-            body = strings.packStatsHelpAverageTime
+            title = strings.common.averageTimeStatLabel,
+            body = strings.statsPack.packStatsHelpAverageTime
         ),
         HelpTopic(
             iconRes = UIcons.Actions.Details,
             iconTint = Navy500,
             circleColor = Navy100,
-            title = strings.packLastSessionLabel,
-            body = strings.packStatsHelpLastSession
+            title = strings.statsPack.packLastSessionLabel,
+            body = strings.statsPack.packStatsHelpLastSession
         ),
         HelpTopic(
             iconRes = UIcons.Actions.Play,
             iconTint = Purple700,
             circleColor = Purple100,
-            title = strings.packMostUsedModeLabel,
-            body = strings.packStatsHelpMostUsedMode
+            title = strings.statsPack.packMostUsedModeLabel,
+            body = strings.statsPack.packStatsHelpMostUsedMode
         ),
         HelpTopic(
             iconRes = UIcons.Cards.Check,
             iconTint = Teal700,
             circleColor = Teal100,
-            title = strings.packBestPerformance,
-            body = strings.packStatsHelpBestPerformance
+            title = strings.statsPack.packBestPerformance,
+            body = strings.statsPack.packStatsHelpBestPerformance
         ),
         HelpTopic(
             iconRes = UIcons.Actions.Study,
             iconTint = Orange700,
             circleColor = Orange100,
-            title = strings.packStatsHelpMasteryTitle,
-            body = strings.packStatsHelpMastery
+            title = strings.statsPack.packStatsHelpMasteryTitle,
+            body = strings.statsPack.packStatsHelpMastery
         ),
     )
 
@@ -119,13 +119,13 @@ fun PackStatsHelpRoute(modifier: Modifier = Modifier) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    text = strings.packStatsHelpTitle,
+                    text = strings.statsPack.packStatsHelpTitle,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = Ink950
                 )
                 UMarkdownText(
-                    markdown = strings.packStatsHelpIntro,
+                    markdown = strings.statsPack.packStatsHelpIntro,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Neutral500,
                     modifier = Modifier.fillMaxWidth()

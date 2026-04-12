@@ -136,7 +136,7 @@ class FolderViewModel(
                 dialogState.value = FolderDialogState.None
                 events.send(
                     FolderUiEvent.ShowToast(
-                        message = strings.value.folderCreatedToast,
+                        message = strings.value.common.folderCreatedToast,
                         tone = UToastTone.Success
                     )
                 )
@@ -160,7 +160,7 @@ class FolderViewModel(
                 dialogState.value = FolderDialogState.None
                 events.send(
                     FolderUiEvent.ShowToast(
-                        message = strings.value.packCreatedToast,
+                        message = strings.value.common.packCreatedToast,
                         tone = UToastTone.Success
                     )
                 )
@@ -192,7 +192,7 @@ class FolderViewModel(
                 dialogState.value = FolderDialogState.None
                 events.send(
                     FolderUiEvent.ShowToast(
-                        message = strings.value.folderDeletedToast,
+                        message = strings.value.common.folderDeletedToast,
                         tone = UToastTone.Info
                     )
                 )
@@ -222,7 +222,7 @@ class FolderViewModel(
                 dialogState.value = FolderDialogState.None
                 events.send(
                     FolderUiEvent.ShowToast(
-                        message = strings.value.packDeletedToast,
+                        message = strings.value.common.packDeletedToast,
                         tone = UToastTone.Info
                     )
                 )
@@ -241,7 +241,7 @@ class FolderViewModel(
                 dialogState.value = FolderDialogState.None
                 events.send(
                     FolderUiEvent.ShowToast(
-                        message = strings.value.folderDeletedToast,
+                        message = strings.value.common.folderDeletedToast,
                         tone = UToastTone.Info
                     )
                 )
@@ -260,7 +260,7 @@ class FolderViewModel(
                 dialogState.value = FolderDialogState.None
                 events.send(
                     FolderUiEvent.ShowToast(
-                        message = strings.value.importUQuizSuccess(result.rootName),
+                        message = strings.value.common.importUQuizSuccess(result.rootName),
                         tone = UToastTone.Success
                     )
                 )
@@ -292,7 +292,7 @@ class FolderViewModel(
         viewModelScope.launch {
             events.send(
                 FolderUiEvent.ShowToast(
-                    message = strings.value.exportUQuizSuccess(successName),
+                    message = strings.value.common.exportUQuizSuccess(successName),
                     tone = UToastTone.Success
                 )
             )

@@ -1,11 +1,14 @@
 package com.uquiz.android.ui.navigation
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,8 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -31,38 +34,40 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.uquiz.android.R
 import com.uquiz.android.ui.AppRepositories
 import com.uquiz.android.ui.designsystem.components.feedback.LocalToastController
 import com.uquiz.android.ui.designsystem.components.feedback.UToastHost
 import com.uquiz.android.ui.designsystem.components.feedback.rememberUToastController
 import com.uquiz.android.ui.designsystem.tokens.UTheme
-import com.uquiz.android.ui.feature.folder.FolderRoute
-import com.uquiz.android.ui.feature.game.GameRoute
-import com.uquiz.android.ui.feature.help.PackStatsHelpRoute
 import com.uquiz.android.ui.feature.home.HomeRoute
 import com.uquiz.android.ui.feature.library.LibraryRoute
-import com.uquiz.android.ui.feature.pack.PackRoute
 import com.uquiz.android.ui.feature.preferences.PreferencesRoute
-import com.uquiz.android.ui.feature.question.QuestionRoute
-import com.uquiz.android.ui.feature.quickgame.QuickGameRoute
-import com.uquiz.android.ui.feature.stats.screens.pack.PackStatsRoute
-import com.uquiz.android.ui.feature.stats.screens.stats.StatsRoute
-import com.uquiz.android.ui.feature.study.screens.intro.StudyIntroRoute
-import com.uquiz.android.ui.feature.study.screens.session.StudySessionRoute
-import com.uquiz.android.ui.feature.study.screens.summary.StudySummaryRoute
 import com.uquiz.android.ui.i18n.LocalStrings
 import com.uquiz.android.ui.i18n.stringsFor
+import com.uquiz.android.ui.navigation.chrome.navigationChromeStateForRoute
+import com.uquiz.android.ui.navigation.components.AppBottomNavBar
 import com.uquiz.android.ui.navigation.components.UNavigationTrailBar
 import com.uquiz.android.ui.navigation.components.UTopBar
+import com.uquiz.android.ui.navigation.graph.addGameGraph
+import com.uquiz.android.ui.navigation.graph.addLibraryGraph
+import com.uquiz.android.ui.navigation.graph.addStatsGraph
+import com.uquiz.android.ui.navigation.graph.addStudyGraph
+import com.uquiz.android.ui.navigation.tree.TopLevelDestination
+import com.uquiz.android.ui.navigation.tree.fallbackNavigationContext
+import com.uquiz.android.ui.navigation.tree.gameRoutePatterns
+import com.uquiz.android.ui.navigation.tree.isTopLevelRoute
+import com.uquiz.android.ui.navigation.tree.resolveNavigationContext
+import com.uquiz.android.ui.navigation.tree.studyRoutePatterns
+import com.uquiz.android.ui.navigation.tree.topLevelDestinationForRoute
+import com.uquiz.android.ui.navigation.tree.topLevelRoutes
 import kotlinx.coroutines.launch
 
+@SuppressLint("RestrictedApi")
 @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
 @Composable
 fun AppNavGraph(repositories: AppRepositories) {
@@ -79,23 +84,47 @@ fun AppNavGraph(repositories: AppRepositories) {
 
     val currentEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentEntry?.destination?.route
-    // Señal para que StudySessionRoute muestre el diálogo de salida cuando el back
-    // llega desde el top bar o el bottom nav (no desde el gesto del sistema).
-    var studySessionExitRequest by remember { mutableStateOf(false) }
+
+    // Estado compartido con los sub-grafos para mostrar el diálogo de salida
+    // cuando el usuario toca el top bar o el bottom nav durante una sesión activa.
+    val studyExitState = remember { mutableStateOf(false) }
+    val gameExitState = remember { mutableStateOf(false) }
+
     val strings = remember(preferences.languageCode) { stringsFor(preferences.languageCode) }
+
+
+    // Mantiene el último contexto resuelto: se usa como valor inicial de produceState
+    // al cambiar de ruta, evitando que el título muestre el texto de fallback genérico
+    // ("Mi biblioteca") mientras se espera el nombre real de la carpeta o el pack.
+    var lastResolvedContext by remember {
+        mutableStateOf(fallbackNavigationContext(currentRoute, strings))
+    }
+
     val navigationContext by produceState(
-        initialValue = fallbackNavigationContext(currentRoute, strings),
+        initialValue = lastResolvedContext,
         key1 = currentEntry?.id,
         key2 = preferences.languageCode,
     ) {
-        value =
+        // El destino de nivel superior más reciente en la pila determina cuál pestaña
+        // del bottom nav se resalta, independientemente de cómo se llegó a la ruta actual.
+        val originTopLevel =
+            navController.currentBackStack.value
+                .lastOrNull { it.destination.route in topLevelRoutes }
+                ?.destination
+                ?.route
+                ?.let { topLevelDestinationForRoute(it) }
+                ?: TopLevelDestination.HOME
+        val resolved =
             resolveNavigationContext(
                 entry = currentEntry,
+                originTopLevel = originTopLevel,
                 strings = strings,
                 folderRepository = repositories.folderRepository,
                 packRepository = repositories.packRepository,
                 attemptRepository = repositories.attemptRepository,
             )
+        lastResolvedContext = resolved
+        value = resolved
     }
     val selectedDestination = navigationContext.root
     val isTopLevel = isTopLevelRoute(currentRoute)
@@ -104,6 +133,7 @@ fun AppNavGraph(repositories: AppRepositories) {
             navigationChromeStateForRoute(
                 route = currentRoute,
                 studyRoutes = studyRoutePatterns,
+                gameRoutes = gameRoutePatterns,
             )
         }
     val chromeTransition = updateTransition(targetState = chromeState, label = "navigationChrome")
@@ -134,12 +164,20 @@ fun AppNavGraph(repositories: AppRepositories) {
                     topBar = {
                         UTopBar(
                             title = navigationContext.title,
-                            canNavigateBack = !isTopLevel,
+                            topLevelDestination = if (isTopLevel) selectedDestination else null,
                             onBackClick = {
-                                if (currentRoute?.contains(Routes.STUDY_SESSION) == true) {
-                                    studySessionExitRequest = true
-                                } else {
-                                    navController.popBackStack()
+                                when {
+                                    currentRoute?.contains(Routes.STUDY_SESSION) == true -> {
+                                        studyExitState.value = true
+                                    }
+
+                                    currentRoute?.contains(Routes.GAME_SESSION) == true -> {
+                                        gameExitState.value = true
+                                    }
+
+                                    else -> {
+                                        navController.popBackStack()
+                                    }
                                 }
                             },
                             selectedLang = preferences.languageCode,
@@ -156,36 +194,37 @@ fun AppNavGraph(repositories: AppRepositories) {
                             selected = selectedDestination,
                             variant = chromeState.variant,
                             onDestinationClick = { dest ->
-                                if (currentRoute?.contains(Routes.STUDY_SESSION) == true) {
-                                    studySessionExitRequest = true
-                                } else {
-                                    val route =
-                                        when (dest) {
-                                            TopLevelDestination.HOME -> Routes.HOME
-                                            TopLevelDestination.LIBRARY -> Routes.LIBRARY
-                                            TopLevelDestination.GAME -> Routes.GAME
-                                            TopLevelDestination.STATS -> Routes.STATS
+                                when {
+                                    currentRoute?.contains(Routes.STUDY_SESSION) == true -> {
+                                        studyExitState.value = true
+                                    }
+
+                                    currentRoute?.contains(Routes.GAME_SESSION) == true -> {
+                                        gameExitState.value = true
+                                    }
+
+                                    dest == selectedDestination -> {
+                                        // No-op: ya estamos en la pestaña seleccionada.
+                                    }
+
+                                    else -> {
+                                        val route =
+                                            when (dest) {
+                                                TopLevelDestination.HOME -> Routes.HOME
+                                                TopLevelDestination.LIBRARY -> Routes.LIBRARY
+                                                TopLevelDestination.GAME -> Routes.GAME
+                                                TopLevelDestination.STATS -> Routes.STATS
+                                            }
+                                        navController.navigate(route) {
+                                            popUpTo(navController.graph.startDestinationId)
+                                            launchSingleTop = true
                                         }
-                                    navController.navigate(route) {
-                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
                                     }
                                 }
                             },
                         )
                     },
                 ) { paddingValues ->
-                    val onFolderClick: (String, String) -> Unit = { id, _ ->
-                        navController.navigate(Routes.folderRoute(id))
-                    }
-                    val onPackClick: (String, String) -> Unit = { id, _ ->
-                        navController.navigate(Routes.packRoute(id))
-                    }
-                    val onFolderDeleted: () -> Unit = {
-                        navController.popBackStack()
-                    }
-
                     Box(
                         modifier =
                             Modifier
@@ -223,6 +262,12 @@ fun AppNavGraph(repositories: AppRepositories) {
                                     navController = navController,
                                     startDestination = Routes.HOME,
                                     modifier = Modifier.fillMaxSize(),
+                                    // Fade sincronizado con la transición del chrome (260 ms):
+                                    // así el contenido y la barra/breadcrumb cambian a la vez.
+                                    enterTransition = { fadeIn(animationSpec = tween(220)) },
+                                    exitTransition = { fadeOut(animationSpec = tween(220)) },
+                                    popEnterTransition = { fadeIn(animationSpec = tween(220)) },
+                                    popExitTransition = { fadeOut(animationSpec = tween(220)) },
                                 ) {
                                     composable(Routes.HOME) {
                                         HomeRoute(
@@ -232,12 +277,14 @@ fun AppNavGraph(repositories: AppRepositories) {
                                             attemptRepository = repositories.attemptRepository,
                                             packRepository = repositories.packRepository,
                                             onContinuePlayingClick = {
-                                                navController.navigate(
-                                                    Routes.quickGameRoute(it),
-                                                )
+                                                navController.navigate(Routes.gameIntroRoute(it))
                                             },
-                                            onContinueStudyingClick = { navController.navigate(Routes.studyRoute(it)) },
-                                            onProfileClick = { navController.navigate(Routes.PREFERENCES) },
+                                            onContinueStudyingClick = {
+                                                navController.navigate(Routes.studyRoute(it))
+                                            },
+                                            onProfileClick = {
+                                                navController.navigate(Routes.PREFERENCES)
+                                            },
                                         )
                                     }
 
@@ -254,250 +301,22 @@ fun AppNavGraph(repositories: AppRepositories) {
                                             packRepository = repositories.packRepository,
                                             packStatsRepository = repositories.packStatsRepository,
                                             importExportRepository = repositories.importExportRepository,
-                                            onFolderClick = onFolderClick,
-                                            onPackClick = onPackClick,
-                                        )
-                                    }
-
-                                    composable(Routes.GAME) {
-                                        GameRoute()
-                                    }
-
-                                    composable(Routes.STATS) {
-                                        StatsRoute(
-                                            userStatsRepository = repositories.userStatsRepository,
-                                        )
-                                    }
-
-                                    composable(
-                                        route = "${Routes.FOLDER}/{${Routes.ARG_FOLDER_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_FOLDER_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val folderId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_FOLDER_ID)
-                                                ?: return@composable
-                                        FolderRoute(
-                                            folderId = folderId,
-                                            folderRepository = repositories.folderRepository,
-                                            packRepository = repositories.packRepository,
-                                            packStatsRepository = repositories.packStatsRepository,
-                                            importExportRepository = repositories.importExportRepository,
-                                            onFolderClick = onFolderClick,
-                                            onPackClick = onPackClick,
-                                            onFolderDeleted = onFolderDeleted,
-                                        )
-                                    }
-
-                                    composable(
-                                        route = "${Routes.PACK}/{${Routes.ARG_PACK_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val packId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_PACK_ID)
-                                                ?: return@composable
-                                        PackRoute(
-                                            packId = packId,
-                                            packRepository = repositories.packRepository,
-                                            packStatsRepository = repositories.packStatsRepository,
-                                            importExportRepository = repositories.importExportRepository,
-                                            onPackTitleResolved = { },
-                                            onStudyModeClick = { navController.navigate(Routes.studyRoute(it)) },
-                                            onQuickGameClick = { navController.navigate(Routes.quickGameRoute(it)) },
-                                            onDetailedStatsClick = {
-                                                navController.navigate(
-                                                    Routes.packStatsRoute(it),
-                                                )
+                                            onFolderClick = { id, _ ->
+                                                navController.navigate(Routes.folderRoute(id))
                                             },
-                                            onCreateQuestionClick = {
-                                                navController.navigate(
-                                                    Routes.questionCreateRoute(it),
-                                                )
+                                            onPackClick = { id, _ ->
+                                                navController.navigate(Routes.packRoute(id))
                                             },
-                                            onQuestionClick = { currentPackId, questionId ->
-                                                navController.navigate(
-                                                    Routes.questionEditRoute(currentPackId, questionId),
-                                                )
-                                            },
-                                            onPackDeleted = { navController.popBackStack() },
-                                        )
-                                    }
-
-                                    composable(
-                                        route = "${Routes.PACK_STATS}/{${Routes.ARG_PACK_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val packId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_PACK_ID)
-                                                ?: return@composable
-                                        PackStatsRoute(
-                                            packId = packId,
-                                            packRepository = repositories.packRepository,
-                                            packStatsRepository = repositories.packStatsRepository,
-                                            onBackToPack = {
-                                                navController.popBackStack(Routes.packRoute(packId), false)
-                                            },
-                                            onHelpClick = { navController.navigate(Routes.packStatsHelpRoute(packId)) },
-                                        )
-                                    }
-
-                                    composable(
-                                        route = "${Routes.PACK_STATS_HELP}/{${Routes.ARG_PACK_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) {
-                                        PackStatsHelpRoute()
-                                    }
-
-                                    composable(
-                                        route = "${Routes.STUDY}/{${Routes.ARG_PACK_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val packId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_PACK_ID)
-                                                ?: return@composable
-                                        StudyIntroRoute(
-                                            packId = packId,
-                                            packRepository = repositories.packRepository,
-                                            attemptRepository = repositories.attemptRepository,
-                                            onBack = { navController.popBackStack() },
-                                            onOpenSession = {
-                                                navController.navigate(Routes.studySessionRoute(packId))
+                                            onRandomStudyClick = { packId ->
+                                                navController.navigate(Routes.studyRoute(packId))
                                             },
                                         )
                                     }
 
-                                    composable(
-                                        route = "${Routes.STUDY_SESSION}/{${Routes.ARG_PACK_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val packId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_PACK_ID)
-                                                ?: return@composable
-                                        StudySessionRoute(
-                                            packId = packId,
-                                            packRepository = repositories.packRepository,
-                                            attemptRepository = repositories.attemptRepository,
-                                            finalizeAttemptAnalyticsUseCase = repositories.finalizeAttemptAnalyticsUseCase,
-                                            externalExitRequested = studySessionExitRequest,
-                                            onExternalExitConsumed = { studySessionExitRequest = false },
-                                            onExitToPack = {
-                                                navController.popBackStack(Routes.packRoute(packId), false)
-                                            },
-                                            onFinished = { attemptId ->
-                                                navController.navigate(Routes.studySummaryRoute(attemptId)) {
-                                                    popUpTo(Routes.studyRoute(packId)) { inclusive = false }
-                                                    launchSingleTop = true
-                                                }
-                                            },
-                                        )
-                                    }
-
-                                    composable(
-                                        route = "${Routes.STUDY_SUMMARY}/{${Routes.ARG_ATTEMPT_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_ATTEMPT_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val attemptId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_ATTEMPT_ID)
-                                                ?: return@composable
-                                        StudySummaryRoute(
-                                            attemptId = attemptId,
-                                            attemptRepository = repositories.attemptRepository,
-                                            packRepository = repositories.packRepository,
-                                            onBackToPack = { packId ->
-                                                navController.popBackStack(Routes.packRoute(packId), false)
-                                            },
-                                        )
-                                    }
-
-                                    composable(
-                                        route = "${Routes.QUICK_GAME}/{${Routes.ARG_PACK_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) {
-                                        QuickGameRoute()
-                                    }
-
-                                    composable(
-                                        route = "${Routes.QUESTION_CREATE}/{${Routes.ARG_PACK_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) {
-                                                    type = NavType.StringType
-                                                },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val packId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_PACK_ID)
-                                                ?: return@composable
-                                        QuestionRoute(
-                                            packId = packId,
-                                            questionId = null,
-                                            questionRepository = repositories.questionRepository,
-                                            packRepository = repositories.packRepository,
-                                            onDone = { navController.popBackStack() },
-                                        )
-                                    }
-
-                                    composable(
-                                        route = "${Routes.QUESTION_EDIT}/{${Routes.ARG_PACK_ID}}/{${Routes.ARG_QUESTION_ID}}",
-                                        arguments =
-                                            listOf(
-                                                navArgument(Routes.ARG_PACK_ID) { type = NavType.StringType },
-                                                navArgument(Routes.ARG_QUESTION_ID) { type = NavType.StringType },
-                                            ),
-                                    ) { backStackEntry ->
-                                        val packId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_PACK_ID)
-                                                ?: return@composable
-                                        val questionId =
-                                            backStackEntry.arguments?.getString(Routes.ARG_QUESTION_ID)
-                                                ?: return@composable
-                                        QuestionRoute(
-                                            packId = packId,
-                                            questionId = questionId,
-                                            questionRepository = repositories.questionRepository,
-                                            packRepository = repositories.packRepository,
-                                            onDone = { navController.popBackStack() },
-                                        )
-                                    }
+                                    addLibraryGraph(navController, repositories)
+                                    addStudyGraph(navController, repositories, studyExitState)
+                                    addGameGraph(navController, repositories, gameExitState)
+                                    addStatsGraph(navController, repositories)
                                 }
                             }
                         }
@@ -507,5 +326,5 @@ fun AppNavGraph(repositories: AppRepositories) {
                 UToastHost(manager = toastController)
             }
         }
-    } // UTheme
+    }
 }

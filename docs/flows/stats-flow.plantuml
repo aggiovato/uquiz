@@ -1,0 +1,28 @@
+@startuml stats-flow
+
+start
+:Abrir tab Stats;
+:Cargar dashboard user stats;
+
+repeat
+  if (Cambiar modo?) then (si)
+    :Aplicar filtro All / Study / Game;
+  endif
+  if (Cambiar periodo?) then (si)
+    :Aplicar filtro All / 7d / 30d;
+  endif
+  :Recalcular KPIs, tendencia,\npack bars e insights;
+repeat while (Seguir explorando?) is (si)
+
+if (Abrir ayuda?) then (si)
+  :User stats help\n(objetivo MVP);
+endif
+
+if (Abrir pack stats?) then (si)
+  :Pack stats;
+  :Pack stats help;
+endif
+
+stop
+
+@enduml

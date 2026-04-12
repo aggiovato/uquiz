@@ -63,12 +63,12 @@ fun SafeDeleteEntityDialog(
         decorativeTint = Red700,
         actions = {
             UTextButton(
-                text = strings.cancel,
+                text = strings.common.cancel,
                 onClick = onDismiss,
             )
             Spacer(Modifier.width(12.dp))
             UFilledButton(
-                text = strings.delete,
+                text = strings.common.delete,
                 onClick = onConfirm,
                 tone = UButtonTone.Danger,
                 enabled = canDelete,
@@ -95,8 +95,8 @@ fun SafeDeleteEntityDialog(
         Spacer(Modifier.height(14.dp))
         UTextField(
             value = keywordInput,
-            onValueChange = { },
-            placeholder = strings.deleteKeywordHint,
+            onValueChange = { keywordInput = it },
+            placeholder = strings.common.deleteKeywordHint,
         )
     }
 }

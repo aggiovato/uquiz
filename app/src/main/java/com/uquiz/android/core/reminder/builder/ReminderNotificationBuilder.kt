@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -31,7 +32,7 @@ class ReminderNotificationBuilder(
                 .getLaunchIntentForPackage(context.packageName)
                 ?.apply {
                     flags =
-                        android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
                 }
 
         val tapPendingIntent =
@@ -44,10 +45,14 @@ class ReminderNotificationBuilder(
                 )
             }
 
+        val largeIcon = BitmapFactory.decodeResource(context.resources, message.largeIconRes)
+
         val notification =
             NotificationCompat
                 .Builder(context, REMINDER_CHANNEL_ID)
                 .setSmallIcon(R.drawable.u_reminder)
+                .setColor(ContextCompat.getColor(context, R.color.notification_accent))
+                .setLargeIcon(largeIcon)
                 .setContentTitle(message.title)
                 .setContentText(message.text)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message.text))

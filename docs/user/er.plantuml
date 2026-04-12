@@ -2,7 +2,7 @@
 
 !include ../_styles.iuml
 
-title <size:16><b>User Domain</b></size>\n<size:11><color:#60727F>UserProfile · UserPreferences</color></size>
+title <size:16><b>User Domain</b></size>\n<size:11><color:#60727F>UserProfile · UserPreferences · CurrentUserSelection</color></size>
 
 entity "user_profiles" as UserProfile <<user>> {
     PK(id)              : TEXT
@@ -25,11 +25,23 @@ entity "UserPreferences" as UserPreferences <<datastore>> {
     ..Set<String>: MON|TUE|WED|THU|FRI|SAT|SUN..
 }
 
-UserProfile ..> UserPreferences : "mismo userId\n(CurrentUserRepository)"
+entity "CurrentUserSelection" as CurrentUser <<datastore>> {
+    current_user_id         : TEXT
+}
+
+CurrentUser ..> UserProfile     : "id activo"
+CurrentUser ..> UserPreferences : "preferencias del user activo"
 
 note right of UserPreferences
   No es una tabla Room.
   Persiste en DataStore (Proto).
+end note
+
+note right of CurrentUser
+  Seleccion local del usuario activo.
+  Hoy apunta al pseudo-user del MVP,
+  pero deja preparada la transicion
+  a cuentas reales.
 end note
 
 @enduml

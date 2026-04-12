@@ -5,17 +5,19 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import com.uquiz.android.data.content.entity.FolderEntity
-import com.uquiz.android.data.content.entity.FolderWithCountsEntity
-import com.uquiz.android.data.content.relations.FolderWithChildren
+import com.uquiz.android.data.content.query.FolderWithCountsRow
 import com.uquiz.android.data.content.relations.FolderWithPacks
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * ### FolderDao
+ *
+ * Acceso reactivo y puntual a la tabla `folders`.
+ * Las queries de conteo producen rows tipados definidos en `query/`.
+ */
 @Dao
 interface FolderDao {
-    /**
-     * Observe folders by parent. parentId = null → root folders.
-     * Ordered by name ASC.
-     */
+    /** Observa las carpetas hijas del [parentId] dado, o las raíz si es `null`. Ordenadas por nombre. */
     @Query(
         """
         SELECT * FROM folders
@@ -25,33 +27,20 @@ interface FolderDao {
     )
     fun observeByParent(parentId: String?): Flow<List<FolderEntity>>
 
-    /**
-     * Get folder by ID
-     */
     @Query("SELECT * FROM folders WHERE id = :id")
     suspend fun getById(id: String): FolderEntity?
 
-    /**
-     * Observe folder by ID
-     */
     @Query("SELECT * FROM folders WHERE id = :id")
     fun observeById(id: String): Flow<FolderEntity?>
 
-    /**
-     * Insert or update folder
-     */
     @Upsert
     suspend fun upsert(folder: FolderEntity)
 
-    /**
-     * Delete folder by ID (cascades to children and packs)
-     */
+    /** Elimina la carpeta por ID en cascada (subcarpetas y packs incluidos). */
     @Query("DELETE FROM folders WHERE id = :id")
     suspend fun deleteById(id: String)
 
-    /**
-     * Get all folders (for hierarchy building)
-     */
+    /** Devuelve todas las carpetas sin filtro, ordenadas por nombre. Útil para construir la jerarquía completa. */
     @Query("SELECT * FROM folders ORDER BY name ASC")
     suspend fun getAll(): List<FolderEntity>
 
@@ -71,23 +60,7 @@ interface FolderDao {
         excludeId: String? = null,
     ): Boolean
 
-    /**
-     * Get folder with its packs
-     */
-    @Transaction
-    @Query("SELECT * FROM folders WHERE id = :folderId")
-    suspend fun getFolderWithPacks(folderId: String): FolderWithPacks?
-
-    /**
-     * Get folder with its child folders
-     */
-    @Transaction
-    @Query("SELECT * FROM folders WHERE id = :folderId")
-    suspend fun getFolderWithChildren(folderId: String): FolderWithChildren?
-
-    /**
-     * Get all root folders with their packs
-     */
+    /** Observa todas las carpetas raíz con sus packs. */
     @Transaction
     @Query("SELECT * FROM folders WHERE parentId IS NULL ORDER BY name ASC")
     fun observeRootFoldersWithPacks(): Flow<List<FolderWithPacks>>
@@ -102,5 +75,5 @@ interface FolderDao {
         ORDER BY f.name ASC
     """,
     )
-    fun observeByParentWithCounts(parentId: String?): Flow<List<FolderWithCountsEntity>>
+    fun observeByParentWithCounts(parentId: String?): Flow<List<FolderWithCountsRow>>
 }

@@ -3,6 +3,7 @@ package com.uquiz.android.core.reminder.resolver
 import com.uquiz.android.core.reminder.copy.ReminderCopyRegistry
 import com.uquiz.android.core.reminder.model.ReminderMessage
 import com.uquiz.android.core.reminder.enums.ReminderMessageCategory
+import com.uquiz.android.core.reminder.enums.largeIconRes
 import com.uquiz.android.core.reminder.model.ReminderNotificationContext
 import com.uquiz.android.domain.ranking.enums.UserRank
 import kotlin.random.Random
@@ -28,7 +29,12 @@ class ReminderMessageResolver(
             ReminderMessageCategory.RESUME_PACK -> copy.resumePackBodies.random(random).render(context)
         }
 
-        return ReminderMessage(title = title, text = text, category = category)
+        return ReminderMessage(
+            title = title,
+            text = text,
+            category = category,
+            largeIconRes = category.largeIconRes(),
+        )
     }
 
     private fun selectCategory(context: ReminderNotificationContext): ReminderMessageCategory = when {

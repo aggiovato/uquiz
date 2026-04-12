@@ -4,78 +4,69 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.uquiz.android.core.files.writeDocumentText
+import com.uquiz.android.domain.content.enums.DifficultyLevel
 import com.uquiz.android.domain.content.repository.PackRepository
+import com.uquiz.android.domain.importexport.projection.ExportedUQuizFile
 import com.uquiz.android.domain.importexport.repository.ImportExportRepository
+import com.uquiz.android.domain.stats.projection.PackDetailedStats
+import com.uquiz.android.domain.stats.projection.PackOverviewMetrics
 import com.uquiz.android.domain.stats.repository.PackStatsRepository
-import com.uquiz.android.ui.designsystem.animations.screens.UNotFoundMascot
-import com.uquiz.android.ui.designsystem.components.SectionHeader
 import com.uquiz.android.ui.designsystem.components.actionsheet.UActionsSheetFab
 import com.uquiz.android.ui.designsystem.components.actionsheet.UFabActionItem
-import com.uquiz.android.ui.designsystem.components.chips.UToggleChip
 import com.uquiz.android.ui.designsystem.components.feedback.LocalToastController
 import com.uquiz.android.ui.designsystem.components.feedback.UToastTone
-import com.uquiz.android.ui.designsystem.components.inputs.USearchField
+import com.uquiz.android.ui.designsystem.preview.UPreview
 import com.uquiz.android.ui.designsystem.tokens.Navy500
-import com.uquiz.android.ui.designsystem.tokens.Neutral400
 import com.uquiz.android.ui.designsystem.tokens.Red700
 import com.uquiz.android.ui.designsystem.tokens.Teal700
 import com.uquiz.android.ui.designsystem.tokens.UIcons
-import com.uquiz.android.ui.designsystem.tokens.contentColorPalette
-import com.uquiz.android.ui.designsystem.tokens.packSelectableIconPalette
-import com.uquiz.android.ui.feature.pack.components.PackActionButtonsRow
-import com.uquiz.android.ui.feature.pack.components.PackOverviewCard
+import com.uquiz.android.ui.designsystem.tokens.UTheme
+import com.uquiz.android.ui.feature.pack.components.PackDetailContent
+import com.uquiz.android.ui.feature.pack.components.PackDialogs
 import com.uquiz.android.ui.feature.pack.components.PackStatsBottomSheet
-import com.uquiz.android.ui.feature.pack.components.QuestionListItem
-import com.uquiz.android.ui.feature.pack.components.QuestionListItemMinHeight
 import com.uquiz.android.ui.feature.pack.model.PackDialogState
 import com.uquiz.android.ui.feature.pack.model.PackOverviewUiState
 import com.uquiz.android.ui.feature.pack.model.QuestionListItemUiModel
 import com.uquiz.android.ui.i18n.LocalStrings
-import com.uquiz.android.ui.shared.components.dialogs.CreatePackDialog
-import com.uquiz.android.ui.shared.components.dialogs.SafeDeleteEntityDialog
 import kotlinx.coroutines.launch
 
-private val questionItemSpacing = 10.dp
-
+/**
+ * ### PackRoute
+ *
+ * Entrada pública del detalle de un pack.
+ *
+ * Resuelve el [PackViewModel], coordina la exportación del pack y delega el
+ * renderizado puro a [PackScreen].
+ *
+ * @param packId Identificador del pack mostrado.
+ * @param packRepository Repositorio del pack.
+ * @param packStatsRepository Repositorio de estadísticas asociadas al pack.
+ * @param importExportRepository Repositorio de exportación.
+ * @param onPackTitleResolved Callback que informa del título cargado del pack.
+ * @param onStudyModeClick Acción para iniciar el modo estudio.
+ * @param onGameClick Acción para iniciar el modo juego.
+ * @param onDetailedStatsClick Acción para abrir el detalle completo de estadísticas.
+ * @param onCreateQuestionClick Acción para crear una nueva pregunta.
+ * @param onQuestionClick Acción para abrir el detalle de una pregunta.
+ * @param onPackDeleted Acción a ejecutar tras borrar el pack.
+ */
 @Composable
 fun PackRoute(
     packId: String,
@@ -84,7 +75,7 @@ fun PackRoute(
     importExportRepository: ImportExportRepository,
     onPackTitleResolved: (String) -> Unit,
     onStudyModeClick: (String) -> Unit,
-    onQuickGameClick: (String) -> Unit,
+    onGameClick: (String) -> Unit,
     onDetailedStatsClick: (String) -> Unit,
     onCreateQuestionClick: (String) -> Unit,
     onQuestionClick: (String, String) -> Unit,
@@ -104,23 +95,19 @@ fun PackRoute(
                 ),
         )
     val uiState by viewModel.uiState.collectAsState()
-    var pendingExport by remember {
-        mutableStateOf<com.uquiz.android.domain.importexport.projection.ExportedUQuizFile?>(
-            null,
-        )
-    }
+    var pendingExport by remember { mutableStateOf<ExportedUQuizFile?>(null) }
+
     val packExportLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.CreateDocument("application/octet-stream"),
+        ) { uri ->
             val exportFile = pendingExport ?: return@rememberLauncherForActivityResult
-            if (uri == null) {
-                pendingExport = null
-                return@rememberLauncherForActivityResult
-            }
+            if (uri == null) return@rememberLauncherForActivityResult
             scope.launch {
                 try {
                     context.writeDocumentText(uri, exportFile.content)
                     toastController.show(
-                        strings.exportUQuizSuccess(
+                        strings.common.exportUQuizSuccess(
                             uiState.packTitle.ifBlank { exportFile.fileName.removeSuffix(".uquiz") },
                         ),
                         UToastTone.Success,
@@ -142,7 +129,7 @@ fun PackRoute(
     PackScreen(
         uiState = uiState,
         onStudyModeClick = { onStudyModeClick(packId) },
-        onQuickGameClick = { onQuickGameClick(packId) },
+        onGameClick = { onGameClick(packId) },
         onCreateQuestionClick = { onCreateQuestionClick(packId) },
         onDeletePackClick = viewModel::onDeletePackRequested,
         onDeletePackConfirm = { viewModel.onDeletePackConfirmed(onPackDeleted) },
@@ -175,7 +162,7 @@ fun PackRoute(
 private fun PackScreen(
     uiState: PackOverviewUiState,
     onStudyModeClick: () -> Unit,
-    onQuickGameClick: () -> Unit,
+    onGameClick: () -> Unit,
     onCreateQuestionClick: () -> Unit,
     onDeletePackClick: () -> Unit,
     onDeletePackConfirm: () -> Unit,
@@ -191,175 +178,29 @@ private fun PackScreen(
     modifier: Modifier = Modifier,
 ) {
     val strings = LocalStrings.current
-    val density = LocalDensity.current
-    val itemExtentPx = with(density) { (QuestionListItemMinHeight + questionItemSpacing).toPx() }
 
-    val displayQuestions = remember { mutableStateListOf<QuestionListItemUiModel>() }
-    var draggedIndex by remember { mutableStateOf<Int?>(null) }
-    var dragOffset by remember { mutableFloatStateOf(0f) }
-    var reorderMode by remember { mutableStateOf(false) }
-    var filterMode by remember { mutableStateOf(false) }
-    var filterQuery by remember { mutableStateOf("") }
-    val visibleQuestions by remember {
-        derivedStateOf {
-            if (filterMode && filterQuery.isNotBlank()) {
-                displayQuestions.filter { it.markdownText.contains(filterQuery, ignoreCase = true) }
-            } else {
-                displayQuestions.toList()
-            }
-        }
-    }
-
-    LaunchedEffect(uiState.questions) {
-        if (draggedIndex == null) {
-            displayQuestions.clear()
-            displayQuestions.addAll(uiState.questions)
-        }
+    // El contenido entra cuando el título del pack está disponible (primera emisión real
+    // de Room), solapándose con el fadeIn del NavHost (220ms) para ocultar el estado
+    // inicial vacío del stateIn y el glitch de lista vacía durante la transición.
+    var contentVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(uiState.packTitle) {
+        if (uiState.packTitle.isNotBlank()) contentVisible = true
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding =
-                PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 18.dp,
-                    bottom = 96.dp,
-                ),
-            verticalArrangement = Arrangement.spacedBy(questionItemSpacing),
+        AnimatedVisibility(
+            visible = contentVisible,
+            enter = fadeIn(tween(280)) + slideInVertically(tween(320)) { it / 16 },
         ) {
-            item {
-                PackOverviewCard(
-                    title = uiState.packTitle,
-                    description = uiState.packDescription,
-                    overview = uiState.overview,
-                    onEditClick = onEditPackClick,
-                    onStatsClick = onStatsClick,
-                )
-                Spacer(Modifier.height(18.dp))
-                PackActionButtonsRow(
-                    canStartStudy = uiState.canStartStudy,
-                    canStartGame = uiState.canStartGame,
-                    onStudyClick = onStudyModeClick,
-                    onQuickGameClick = onQuickGameClick,
-                )
-                Spacer(Modifier.height(22.dp))
-                if (uiState.questions.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        SectionHeader(strings.questionsSection(visibleQuestions.size))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            UToggleChip(
-                                iconRes = UIcons.Actions.Reorder,
-                                label = strings.reorderLabel,
-                                isActive = reorderMode,
-                                onClick = {
-                                    reorderMode = !reorderMode
-                                    if (reorderMode) {
-                                        filterMode = false
-                                        filterQuery = ""
-                                    }
-                                },
-                            )
-                            UToggleChip(
-                                iconRes = UIcons.Actions.Filter,
-                                label = strings.filterLabel,
-                                isActive = filterMode,
-                                onClick = {
-                                    filterMode = !filterMode
-                                    if (filterMode) {
-                                        reorderMode = false
-                                    } else {
-                                        filterQuery = ""
-                                    }
-                                },
-                            )
-                        }
-                    }
-                    AnimatedVisibility(
-                        visible = filterMode,
-                        enter = expandVertically(tween(220)) + fadeIn(tween(180)),
-                        exit = shrinkVertically(tween(200)) + fadeOut(tween(150)),
-                    ) {
-                        USearchField(
-                            value = filterQuery,
-                            onValueChange = { filterQuery = it },
-                            placeholder = strings.filterQuestionsHint,
-                            leadingIcon = painterResource(UIcons.Actions.Filter),
-                            modifier = Modifier.padding(top = 10.dp),
-                        )
-                    }
-                    Spacer(Modifier.height(2.dp))
-                } else {
-                    Text(
-                        text = strings.noQuestionsYet,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Neutral400,
-                    )
-                }
-            }
-
-            if (filterMode && filterQuery.isNotBlank() && visibleQuestions.isEmpty()) {
-                item {
-                    UNotFoundMascot(modifier = Modifier.fillMaxWidth().wrapContentHeight())
-                    Text(
-                        text = strings.noSearchResults,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Neutral400,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
-
-            itemsIndexed(visibleQuestions, key = { _, item -> item.questionId }) { index, item ->
-                val displayIndex = displayQuestions.indexOfFirst { it.questionId == item.questionId }
-                QuestionListItem(
-                    order = index + 1,
-                    markdownText = item.markdownText,
-                    difficulty = item.difficulty,
-                    translationY = if (draggedIndex == displayIndex) dragOffset else 0f,
-                    isDragging = draggedIndex == displayIndex,
-                    showDragHandle = reorderMode,
-                    onClick = { onQuestionClick(item.questionId) },
-                    onDrag = { delta ->
-                        if (draggedIndex == null) draggedIndex = displayIndex
-                        dragOffset += delta
-                        var currentIndex = draggedIndex ?: displayIndex
-
-                        while (dragOffset > itemExtentPx / 2 && currentIndex < displayQuestions.lastIndex) {
-                            displayQuestions.swap(currentIndex, currentIndex + 1)
-                            currentIndex += 1
-                            draggedIndex = currentIndex
-                            dragOffset -= itemExtentPx
-                        }
-
-                        while (dragOffset < -itemExtentPx / 2 && currentIndex > 0) {
-                            displayQuestions.swap(currentIndex, currentIndex - 1)
-                            currentIndex -= 1
-                            draggedIndex = currentIndex
-                            dragOffset += itemExtentPx
-                        }
-                    },
-                    onDragEnd = {
-                        if (draggedIndex != null) {
-                            onReorderQuestions(displayQuestions.map { it.questionId })
-                        }
-                        draggedIndex = null
-                        dragOffset = 0f
-                    },
-                    onDragCancel = {
-                        draggedIndex = null
-                        dragOffset = 0f
-                        displayQuestions.clear()
-                        displayQuestions.addAll(uiState.questions)
-                    },
-                )
-            }
+            PackDetailContent(
+                uiState = uiState,
+                onStudyModeClick = onStudyModeClick,
+                onGameClick = onGameClick,
+                onReorderQuestions = onReorderQuestions,
+                onQuestionClick = onQuestionClick,
+                onEditPackClick = onEditPackClick,
+                onStatsClick = onStatsClick,
+            )
         }
 
         UActionsSheetFab(
@@ -367,8 +208,8 @@ private fun PackScreen(
                 listOf(
                     UFabActionItem(
                         id = "create_question",
-                        label = strings.newQuestion,
-                        description = strings.createQuestionActionDescription,
+                        label = strings.pack.newQuestion,
+                        description = strings.question.createQuestionActionDescription,
                         iconRes = UIcons.Actions.Edit,
                         containerColor = Navy500,
                         contentColor = Color.White,
@@ -376,8 +217,8 @@ private fun PackScreen(
                     ),
                     UFabActionItem(
                         id = "export_pack",
-                        label = strings.exportUQuizAction,
-                        description = strings.exportUQuizActionDescription,
+                        label = strings.common.exportUQuizAction,
+                        description = strings.common.exportUQuizActionDescription,
                         iconRes = UIcons.Actions.Download,
                         containerColor = Teal700,
                         contentColor = Color.White,
@@ -385,8 +226,8 @@ private fun PackScreen(
                     ),
                     UFabActionItem(
                         id = "delete_pack",
-                        label = strings.deletePack,
-                        description = strings.deletePackConfirmMessage,
+                        label = strings.common.deletePack,
+                        description = strings.common.deletePackConfirmMessage,
                         iconRes = UIcons.Actions.Delete,
                         kind = com.uquiz.android.ui.designsystem.components.actionsheet.UFabActionKind.Destructive,
                         containerColor = Red700,
@@ -398,38 +239,12 @@ private fun PackScreen(
         )
     }
 
-    when (val dialog = uiState.dialogState) {
-        PackDialogState.None -> {
-            Unit
-        }
-
-        is PackDialogState.EditPack -> {
-            CreatePackDialog(
-                title = strings.editPack,
-                description = strings.editPackDescription,
-                confirmLabel = strings.save,
-                onDismiss = onDialogDismiss,
-                onConfirm = onEditPackConfirm,
-                initialTitle = dialog.pack.title,
-                initialDescription = dialog.pack.description.orEmpty(),
-                initialColorHex = dialog.pack.colorHex ?: contentColorPalette.first().hex,
-                initialIcon = dialog.pack.icon ?: packSelectableIconPalette.first().key,
-            )
-        }
-
-        is PackDialogState.DeletePack -> {
-            SafeDeleteEntityDialog(
-                title = strings.deletePack,
-                primaryMessage = strings.deletePackPrimaryMessage,
-                secondaryMessage = strings.deletePackSecondaryMessage,
-                requiredKeyword = strings.deletePackKeyword,
-                keywordInstruction = strings.deletePackTypeKeywordInstruction(strings.deletePackKeyword),
-                headerIconRes = UIcons.Actions.Delete,
-                onDismiss = onDialogDismiss,
-                onConfirm = onDeletePackConfirm,
-            )
-        }
-    }
+    PackDialogs(
+        dialogState = uiState.dialogState,
+        onDialogDismiss = onDialogDismiss,
+        onEditPackConfirm = onEditPackConfirm,
+        onDeletePackConfirm = onDeletePackConfirm,
+    )
 
     if (uiState.showStatsSheet) {
         PackStatsBottomSheet(
@@ -440,11 +255,64 @@ private fun PackScreen(
     }
 }
 
-private fun <T> MutableList<T>.swap(
-    from: Int,
-    to: Int,
-) {
-    if (from == to) return
-    val item = removeAt(from)
-    add(to, item)
+@UPreview
+@Composable
+private fun PackScreenPreview() {
+    UTheme {
+        PackScreen(
+            uiState =
+                PackOverviewUiState(
+                    packId = "pack-1",
+                    packTitle = "Geografía europea",
+                    packDescription = "Repaso de capitales, ríos y cordilleras.",
+                    overview =
+                        PackOverviewMetrics(
+                            questionCount = 18,
+                            accuracyPercent = 70,
+                            sessionsCount = 5,
+                            progressPercent = 44,
+                        ),
+                    detailedStats =
+                        PackDetailedStats(
+                            packId = "pack-1",
+                            totalSessions = 5,
+                            averageAccuracyPercent = 70,
+                            averageDurationMs = 280_000L,
+                            progressPercent = 44,
+                            dominatedQuestions = 8,
+                            totalQuestions = 18,
+                        ),
+                    questions =
+                        listOf(
+                            QuestionListItemUiModel(
+                                questionId = "q1",
+                                markdownText = "¿Cuál es la **capital** de Francia?",
+                                difficulty = DifficultyLevel.MEDIUM,
+                            ),
+                            QuestionListItemUiModel(
+                                questionId = "q2",
+                                markdownText = "¿Qué río atraviesa Viena?",
+                                difficulty = DifficultyLevel.HARD,
+                            ),
+                        ),
+                    canStartStudy = true,
+                    canStartGame = true,
+                    dialogState = PackDialogState.None,
+                ),
+            onStudyModeClick = {},
+            onGameClick = {},
+            onCreateQuestionClick = {},
+            onDeletePackClick = {},
+            onDeletePackConfirm = {},
+            onExportPackClick = {},
+            onReorderQuestions = {},
+            onQuestionClick = {},
+            onEditPackClick = {},
+            onEditPackConfirm = { _, _, _, _ -> },
+            onDialogDismiss = {},
+            onStatsClick = {},
+            onStatsDismiss = {},
+            onSeeFullStatsClick = {},
+        )
+    }
 }

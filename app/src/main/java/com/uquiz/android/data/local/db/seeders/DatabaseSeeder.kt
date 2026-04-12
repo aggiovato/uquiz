@@ -674,20 +674,6 @@ object DatabaseSeeder {
                 completedAt = null,
                 durationMs = null,
                 currentQuestionIndex = 2
-            ),
-            AttemptSeed(
-                id = "attempt-rome-game-active",
-                userId = "local-default-user",
-                mode = "GAME",
-                status = "IN_PROGRESS",
-                primaryPackId = "pack-rome",
-                totalQuestions = 2,
-                correctAnswers = 0,
-                score = 0,
-                startedAt = now - (90 * 60_000L),
-                completedAt = null,
-                durationMs = null,
-                currentQuestionIndex = 1
             )
         )
 
@@ -737,8 +723,7 @@ object DatabaseSeeder {
             AttemptAnswerSeed("ans-rome-g1-q24", "attempt-rome-game-1", "question-24", "opt-24-b", true, 6_500L, 12_000L, now - (4 * oneDay) + 1_000L),
             AttemptAnswerSeed("ans-rome-g1-q25", "attempt-rome-game-1", "question-25", "opt-25-c", true, 8_000L, 12_000L, now - (4 * oneDay) + 2_000L),
             AttemptAnswerSeed("ans-linear-active-q1", "attempt-linear-study-active", "question-1", "opt-1-b", true, 20_000L, null, now - twoHours + 1_000L),
-            AttemptAnswerSeed("ans-linear-active-q6", "attempt-linear-study-active", "question-6", "opt-6-a", false, 25_000L, null, now - twoHours + 2_000L),
-            AttemptAnswerSeed("ans-rome-active-q24", "attempt-rome-game-active", "question-24", "opt-24-b", true, 7_500L, 12_000L, now - (90 * 60_000L) + 1_000L)
+            AttemptAnswerSeed("ans-linear-active-q6", "attempt-linear-study-active", "question-6", "opt-6-a", false, 25_000L, null, now - twoHours + 2_000L)
         )
 
         answers.forEach { answer ->

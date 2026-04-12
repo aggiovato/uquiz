@@ -1,246 +1,68 @@
 package com.uquiz.android.ui.i18n
 
 import androidx.compose.runtime.compositionLocalOf
+import com.uquiz.android.ui.i18n.model.AppErrors
+import com.uquiz.android.ui.i18n.model.CommonStrings
+import com.uquiz.android.ui.i18n.model.FolderStrings
+import com.uquiz.android.ui.i18n.model.GameHomeStrings
+import com.uquiz.android.ui.i18n.model.GameIntroStrings
+import com.uquiz.android.ui.i18n.model.GameSessionStrings
+import com.uquiz.android.ui.i18n.model.GameSummaryStrings
+import com.uquiz.android.ui.i18n.model.HomeStrings
+import com.uquiz.android.ui.i18n.model.LibraryStrings
+import com.uquiz.android.ui.i18n.model.NavStrings
+import com.uquiz.android.ui.i18n.model.PackStatsStrings
+import com.uquiz.android.ui.i18n.model.PackStrings
+import com.uquiz.android.ui.i18n.model.PreferencesStrings
+import com.uquiz.android.ui.i18n.model.QuestionStrings
+import com.uquiz.android.ui.i18n.model.StudyIntroStrings
+import com.uquiz.android.ui.i18n.model.StudySessionStrings
+import com.uquiz.android.ui.i18n.model.UserStatsStrings
+import com.uquiz.android.ui.i18n.strings.CaStrings
+import com.uquiz.android.ui.i18n.strings.DeStrings
+import com.uquiz.android.ui.i18n.strings.EnStrings
+import com.uquiz.android.ui.i18n.strings.EsStrings
+import com.uquiz.android.ui.i18n.strings.FrStrings
+import com.uquiz.android.ui.i18n.strings.ItStrings
+import com.uquiz.android.ui.i18n.strings.JaStrings
 
-data class AppStrings(
+// ─── Clase principal ──────────────────────────────────────────────────────────
+
+/**
+ * Contenedor raíz de todos los strings localizados de la aplicación.
+ * Agrupa los textos por pantalla/feature para evitar el límite de 256 argumentos de DEX.
+ * Acceder siempre a través de [LocalStrings] o [stringsFor].
+ */
+class AppStrings(
     /** Mensajes de error localizados — consumidos por UiMessageResolver. */
     val errors: AppErrors,
-    // Bottom nav
-    val navHome: String,
-    val navLibrary: String,
-    val navGame: String,
-    val navStats: String,
-    // Home
-    val homeGreeting: (String) -> String,
-    val homeReadyPrompt: String,
-    val homeDayStreakLabel: String,
-    val homeTotalPointsLabel: String,
-    val homeContinuePlaying: String,
-    val homeContinueStudying: String,
-    // Library
-    val myLibrary: String,
-    val searchPlaceholder: String,
-    val foldersSection: String,
-    val recentPacksSection: String,
-    // Folder
-    val subfoldersSection: String,
-    val packsInFolderSection: String,
-    val nothingHereYet: String,
-    val noSearchResults: String,
-    val newFolder: String,
-    val newPack: String,
-    // Questions
-    val noQuestionsYet: String,
-    val newQuestion: String,
-    val questionsSection: (Int) -> String,
-    val questionsStatLabel: String,
-    val accuracyStatLabel: String,
-    val sessionsStatLabel: String,
-    val averageTimeStatLabel: String,
-    val studyMode: String,
-    val studyModeShort: String = studyMode,
-    val studyAction: String,
-    val playMode: String,
-    val playModeShort: String = playMode,
-    val quickGame: String,
-    val comingSoon: String,
-    val questionEditorTitle: String,
-    val newQuestionTitle: String,
-    val editQuestionTitle: String,
-    val studyModeTitle: String,
-    val quickGameTitle: String,
-    val actionsLabel: String,
-    val dangerZoneLabel: String,
-    val previewLabel: String,
-    val questionMarkdownLabel: String,
-    val questionMarkdownHint: String,
-    val questionPreview: String,
-    val explanationMarkdownLabel: String,
-    val explanationMarkdownHint: String,
-    val explanationPreview: String,
-    val optionsSectionTitle: String,
-    val addOption: String,
-    val optionPlaceholder: (Int) -> String,
-    val correctOptionLabel: String,
-    val difficultySectionTitle: String,
-    val deleteQuestionTitle: String,
-    val deleteQuestionConfirmMessage: String,
-    val deleteQuestionPrimaryMessage: String,
-    val deleteQuestionSecondaryMessage: String,
-    val deleteQuestionTypeKeywordInstruction: (String) -> String,
-    val deleteQuestionKeyword: String,
-    val deleteFolderKeyword: String,
-    val deletePackKeyword: String,
-    val deleteKeywordHint: String,
-    val difficultyEasy: String,
-    val difficultyMedium: String,
-    val difficultyHard: String,
-    val difficultyExpert: String,
-    // Study mode
-    val studyIntroTitle: String,
-    val studyReadyDescription: String,
-    val studyAverageDifficultyLabel: String,
-    val studyResumeStudy: String,
-    val studyStartStudy: String,
-    val studyResumeProgress: (Int, Int) -> String,
-    val studyQuestionCounter: (Int, Int) -> String,
-    val studyVerifyAnswer: String,
-    val studyPrevious: String,
-    val studyNext: String,
-    val studyFinish: String,
-    val studyCorrectTitle: String,
-    val studyIncorrectTitle: String,
-    val studyExplanationLabel: String,
-    val studyContinueStudy: String,
-    val studyExitStudy: String,
-    val studyExitTitle: String,
-    val studyExitMessage: String,
-    val studySummaryTitle: String,
-    val studyCorrectAnswersLabel: String,
-    val studyIncorrectAnswersLabel: String,
-    val studyEffectiveTimeLabel: String,
-    val studyBackToPack: String,
-    // Folder counts
-    val subfoldersLabel: (Int) -> String,
-    val packsLabel: (Int) -> String,
-    // Pack row
-    val questionsLabel: (Int) -> String,
-    val progressLabel: String,
-    // Common actions
-    val cancel: String,
-    val create: String,
-    val save: String,
-    val edit: String,
-    val delete: String,
-    // Create folder dialog
-    val createFolderDescription: String,
-    val editFolderDescription: String,
-    val folderNameLabel: String,
-    val folderNameHint: String,
-    val folderColorLabel: String,
-    val folderIconLabel: String,
-    // Quick actions / dialogs
-    val createPackDescription: String,
-    val editPackDescription: String,
-    val packTitleLabel: String,
-    val packTitleHint: String,
-    val packDescriptionLabel: String,
-    val packDescriptionHint: String,
-    val packColorLabel: String,
-    val packIconLabel: String,
-    val seeMore: String,
-    val seeLess: String,
-    val editFolder: String,
-    val editPack: String,
-    val deleteFolder: String,
-    val deleteFolderConfirmMessage: String,
-    val deleteFolderPrimaryMessage: String,
-    val deleteFolderSecondaryMessage: String,
-    val deleteFolderTypeKeywordInstruction: (String) -> String,
-    val deletePack: String,
-    val deletePackConfirmMessage: String,
-    val deletePackPrimaryMessage: String,
-    val deletePackSecondaryMessage: String,
-    val deletePackTypeKeywordInstruction: (String) -> String,
-    val importUQuizAction: String,
-    val exportUQuizAction: String,
-    val createFolderActionDescription: String,
-    val createPackActionDescription: String,
-    val createQuestionActionDescription: String,
-    val importUQuizActionDescription: String,
-    val exportUQuizActionDescription: String,
-    val deleteFolderActionDescription: String,
-    val cancelActionDescription: String,
-    val saveActionDescription: String,
-    val deleteQuestionActionDescription: String,
-    val importUQuizSuccess: (String) -> String,
-    val exportUQuizSuccess: (String) -> String,
-    val folderCreatedToast: String,
-    val folderDeletedToast: String,
-    val packCreatedToast: String,
-    val packDeletedToast: String,
-    val questionCreatedToast: String,
-    val questionDeletedToast: String,
-    val packStatsTitle: String,
-    val packLastSessionLabel: String,
-    val packMostUsedModeLabel: String,
-    val packSeeFullStats: String,
-    val packGeneralSummary: String,
-    val packByMode: String,
-    val packRecentActivity: String,
-    val packSeeAll: String,
-    val packBestPerformance: String,
-    val pointsShortLabel: String = "pts",
-    val packNoSessionsYet: String,
-    val packNoGameSessionsYet: String,
-    val packNoStudySessionsYet: String,
-    val packQuestionsDominated: (Int, Int) -> String,
-    val packThisWeekLabel: (Int) -> String = { count -> "$count this week" },
-    val packStatsHelpAction: String,
-    val packStatsHelpTitle: String,
-    val packStatsHelpIntro: String,
-    val packStatsHelpQuestions: String,
-    val packStatsHelpAccuracy: String,
-    val packStatsHelpSessions: String,
-    val packStatsHelpProgress: String,
-    val packStatsHelpAverageTime: String,
-    val packStatsHelpLastSession: String,
-    val packStatsHelpMostUsedMode: String,
-    val packStatsHelpBestPerformance: String,
-    val packStatsHelpMasteryTitle: String,
-    val packStatsHelpMastery: String,
-    val back: String,
-    val toggleTheme: String,
-    // Language names
-    val langEnglish: String,
-    val langSpanish: String,
-    val langCatalan: String,
-    val langItalian: String,
-    val langJapanese: String,
-    val langFrench: String,
-    val langGerman: String,
-    // Preferences screen
-    val preferencesTitle: String,
-    val profileSectionTitle: String,
-    val profileSectionSubtitle: String,
-    val displayNameLabel: String,
-    val displayNameHint: String,
-    val avatarLabel: String,
-    val avatarChoosePhoto: String = "Choose photo",
-    val avatarUseIcon: String = "Use icon",
-    val appearanceSectionTitle: String,
-    val appearanceSectionSubtitle: String,
-    val languageSectionTitle: String,
-    val languageSectionSubtitle: String,
-    val reminderSectionTitle: String,
-    val reminderSectionSubtitle: String,
-    val reminderEnabledLabel: String,
-    val reminderDaysLabel: String,
-    val reminderTimeLabel: String,
-    val reminderTimePickerTitle: String,
-    val savePreferencesActionDescription: String = "Save your preference changes.",
-    val discardPreferencesActionDescription: String = "Discard the changes made on this screen.",
-    val dayShortMon: String = "M",
-    val dayShortTue: String = "T",
-    val dayShortWed: String = "W",
-    val dayShortThu: String = "T",
-    val dayShortFri: String = "F",
-    val dayShortSat: String = "S",
-    val dayShortSun: String = "S",
-    val confirm: String,
-    val reorderLabel: String = "Reorder",
-    val filterLabel: String = "Filter",
-    val filterQuestionsHint: String = "Search questions...",
+    val nav: NavStrings,
+    val home: HomeStrings,
+    val library: LibraryStrings,
+    val folder: FolderStrings,
+    val pack: PackStrings,
+    val question: QuestionStrings,
+    val studyIntro: StudyIntroStrings,
+    val studySession: StudySessionStrings,
+    val gameHome: GameHomeStrings,
+    val gameIntro: GameIntroStrings,
+    val gameSession: GameSessionStrings,
+    val gameSummary: GameSummaryStrings,
+    val statsPack: PackStatsStrings,
+    val statsUser: UserStatsStrings,
+    val preferences: PreferencesStrings,
+    val common: CommonStrings,
 )
 
 val LocalStrings = compositionLocalOf { EnStrings }
 
-fun stringsFor(code: String): AppStrings = when (code) {
-    "es" -> EsStrings
-    "fr" -> FrStrings
-    "de" -> DeStrings
-    "ca" -> CaStrings
-    "it" -> ItStrings
-    "ja" -> JaStrings
-    else -> EnStrings
-}
+fun stringsFor(code: String): AppStrings =
+    when (code) {
+        "es" -> EsStrings
+        "fr" -> FrStrings
+        "de" -> DeStrings
+        "ca" -> CaStrings
+        "it" -> ItStrings
+        "ja" -> JaStrings
+        else -> EnStrings
+    }

@@ -14,7 +14,7 @@ import com.uquiz.android.ui.designsystem.tokens.Teal900
 enum class UButtonTone { Brand, Secondary, Danger, Neutral }
 
 /** Tamaños disponibles para la familia de botones compartidos. */
-enum class UButtonSize { Regular, Compact }
+enum class UButtonSize { Regular, Compact, Tiny }
 
 /** Devuelve el color de fondo tonal para botones y controles afines. */
 fun uTonalButtonContainerColor(tone: UButtonTone): Color = when (tone) {

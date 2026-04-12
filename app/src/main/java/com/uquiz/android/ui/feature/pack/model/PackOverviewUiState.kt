@@ -4,6 +4,7 @@ import com.uquiz.android.domain.content.enums.DifficultyLevel
 import com.uquiz.android.domain.stats.projection.PackDetailedStats
 import com.uquiz.android.domain.stats.projection.PackOverviewMetrics
 
+/** Estado de UI del detalle de un pack. */
 data class PackOverviewUiState(
     val packId: String,
     val packTitle: String = "",
@@ -18,6 +19,7 @@ data class PackOverviewUiState(
     val dialogState: PackDialogState = PackDialogState.None
 )
 
+/** Modelo de UI usado para mostrar una pregunta dentro del listado del pack. */
 data class QuestionListItemUiModel(
     val questionId: String,
     val markdownText: String,
