@@ -40,13 +40,13 @@ All content and progress is stored locally using **Room**, making the app fully 
 
 ## Screenshots
 
-| Home                               | Library                                  | Pack Details                                     | Stats                                | Preferences                                      |
-|------------------------------------|------------------------------------------|--------------------------------------------------|--------------------------------------|--------------------------------------------------|
-| ![Home](docs/screenshots/home.jpg) | ![Library](docs/screenshots/library.jpg) | ![Pack](docs/screenshots/pack_details.jpg) | ![Stats](docs/screenshots/stats.jpg) | ![Preferences](docs/screenshots/preferences.jpg) |
+| Home | Library | Pack Details | Stats | Preferences |
+|------|---------|--------------|-------|-------------|
+| <img src="docs/screenshots/home.jpg" width="160"> | <img src="docs/screenshots/library.jpg" width="160"> | <img src="docs/screenshots/pack_details.jpg" width="160"> | <img src="docs/screenshots/stats.jpg" width="160"> | <img src="docs/screenshots/preferences.jpg" width="160"> |
 
-| Game Home                              | Game Session                                       | Game Summary                                       | Study Session                                        | Study Summary                                        |
-|----------------------------------------|----------------------------------------------------|----------------------------------------------------|------------------------------------------------------|------------------------------------------------------|
-| ![Game](docs/screenshots/game.jpg) | ![Game Session](docs/screenshots/game_session.jpg) | ![Game Summary](docs/screenshots/game_summary.jpg) | ![Study Session](docs/screenshots/study_session.jpg) | ![Study Summary](docs/screenshots/study_summary.jpg) |
+| Game Home | Game Session | Game Summary | Study Session | Study Summary |
+|-----------|--------------|--------------|---------------|---------------|
+| <img src="docs/screenshots/game.jpg" width="160"> | <img src="docs/screenshots/game_session.jpg" width="160"> | <img src="docs/screenshots/game_summary.jpg" width="160"> | <img src="docs/screenshots/study_session.jpg" width="160"> | <img src="docs/screenshots/study_summary.jpg" width="160"> |
 
 ---
 
