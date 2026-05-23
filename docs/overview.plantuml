@@ -22,7 +22,9 @@ package "content" #E3ECF8 {
         label, text, isCorrect
     }
     entity "pack_questions" as PackQuestion <<join>> {
-        PK(packId, questionId)
+        PK(packId)
+        PK(questionId)
+        --
         sortOrder
     }
 }
@@ -37,10 +39,13 @@ package "attempts" #E0F9F4 {
         pickedOptionId, isCorrect
     }
     entity "attempt_packs" as AttemptPack <<join-attempts>> {
-        PK(attemptId, packId)
+        PK(attemptId)
+        PK(packId)
     }
     entity "attempt_question_plan" as AttemptPlan <<attempts>> {
-        PK(attemptId, questionId)
+        PK(attemptId)
+        PK(questionId)
+        --
         orderIndex, timeLimitMs
     }
 }
@@ -58,7 +63,8 @@ package "stats" #FFF3D6 {
 
 package "ranking" #EBE2FF {
     entity "UserRank" as URank <<ranking>> {
-        userId (PK)
+        PK(userId)
+        --
         currentRank, mmr, perfEwma
         totalXp
     }

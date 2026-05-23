@@ -1,0 +1,163 @@
+@startuml er
+
+allowmixing
+left to right direction
+
+title <size:20><b>UQuiz — Diagrama Entidad-Relación</b></size>
+
+skinparam defaultFontName    "Helvetica, Arial, sans-serif"
+skinparam defaultFontSize    12
+skinparam backgroundColor    #F5F7F7
+skinparam shadowing          false
+skinparam roundcorner        4
+
+skinparam class {
+    BackgroundColor          #FFFFFF
+    BorderColor              #60727F
+    FontColor                #243242
+    AttributeFontSize        11
+    AttributeFontColor       #455563
+    BorderThickness          1
+}
+
+skinparam class<<content>> {
+    HeaderBackgroundColor    #134C8F
+    BorderColor              #0E2743
+    FontColor                #FFFFFF
+}
+
+skinparam class<<join>> {
+    HeaderBackgroundColor    #1A5FAD
+    BorderColor              #0E2743
+    FontColor                #FFFFFF
+    BackgroundColor          #E3ECF8
+    FontSize                 13
+    FontStyle                bold
+    StereotypeFontSize       9
+}
+
+skinparam class<<attempts>> {
+    HeaderBackgroundColor    #00957F
+    BorderColor              #005450
+    FontColor                #FFFFFF
+}
+
+skinparam arrow {
+    Color                    #60727F
+    FontColor                #243242
+    FontSize                 11
+    FontStyle                bold
+}
+
+skinparam legend {
+    FontSize                 12
+    BackgroundColor          #FFFFFF
+    BorderColor              #60727F
+}
+
+' ══════════════════════════════════════════════════════════════════
+'  ENTIDADES
+' ══════════════════════════════════════════════════════════════════
+
+class "Folder" <<content>> {
+    <u>id</u>
+    --
+    name
+    <i>parentId</i>   {nullable}
+    colorHex
+    icon
+}
+
+class "Subfolder" <<content>> {
+    <i>(misma entidad — parentId ≠ null)</i>
+}
+
+class "Pack" <<content>> {
+    <u>id</u>
+    --
+    <i>folderId</i>
+    title
+    description   {nullable}
+    icon
+    colorHex
+}
+
+class "pack_questions" <<join>> {
+    <u><i>packId</i></u>
+    <u><i>questionId</i></u>
+    --
+    sortOrder
+}
+
+class "Question" <<content>> {
+    <u>id</u>
+    --
+    text
+    difficulty
+    explanation   {nullable}
+}
+
+class "Option" <<content>> {
+    <u>id</u>
+    --
+    <i>questionId</i>
+    label
+    text
+    isCorrect
+}
+
+class "Attempt" <<attempts>> {
+    <u>id</u>
+    --
+    userId
+    mode
+    status
+    <i>primaryPackId</i>
+    score
+    totalQuestions
+    correctAnswers
+    startedAt
+    completedAt   {nullable}
+    durationMs    {nullable}
+}
+
+class "AttemptAnswer" <<attempts>> {
+    <u>id</u>
+    --
+    <i>attemptId</i>
+    <i>questionId</i>
+    <i>pickedOptionId</i>   {nullable}
+    isCorrect
+    timeMs
+}
+
+' ══════════════════════════════════════════════════════════════════
+'  RELACIONES — verbo centrado, cardinalidad en cada extremo
+' ══════════════════════════════════════════════════════════════════
+
+Subfolder     --|>          Folder
+Folder        "1   " --  "N  "  Subfolder     : "contiene"
+Folder        "1   " --  "N  "  Pack          : "contiene"
+Pack          "N   " --  "N  "  pack_questions : "agrupa ▸"
+pack_questions "N  " --  "M  "  Question      : "◂ agrupa"
+Question      "1   " --  "N  "  Option        : "tiene"
+Attempt       "N   " --  "1  "  Pack          : "referencia"
+Attempt       "1   " --  "N  "  AttemptAnswer : "genera"
+AttemptAnswer "N   " --  "1  "  Question      : "responde"
+AttemptAnswer "N   " --  "0..1" Option        : "selecciona"
+
+' ══════════════════════════════════════════════════════════════════
+'  LEYENDA
+' ══════════════════════════════════════════════════════════════════
+
+legend bottom
+  |= Notación             |= Significado                       |
+  | <size:13><u>id</u></size>           | Clave primaria (PK)                |
+  | <size:13><i>campo</i></size>        | Clave foránea (FK)                 |
+  | <size:13>{nullable}</size>          | Atributo opcional (NULL)           |
+  | <size:13>1 — N</size>              | Relación uno a muchos              |
+  | <size:13>N — M</size>              | Relación muchos a muchos           |
+  | <size:13>0..1</size>               | Participación opcional (0 ó 1)     |
+endlegend
+
+@enduml

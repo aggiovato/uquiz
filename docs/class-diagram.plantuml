@@ -1,0 +1,279 @@
+@startuml class-diagram
+
+top to bottom direction
+
+skinparam defaultFontName    "Helvetica, Arial, sans-serif"
+skinparam defaultFontSize    11
+skinparam backgroundColor    #F5F7F7
+skinparam shadowing          false
+skinparam roundcorner        6
+skinparam linetype           ortho
+skinparam nodesep            40
+skinparam ranksep            60
+
+skinparam class {
+    BackgroundColor          #FFFFFF
+    BorderColor              #60727F
+    FontColor                #243242
+    AttributeFontSize        10
+    AttributeFontColor       #455563
+    HeaderBackgroundColor    #455563
+    FontColor                #FFFFFF
+    BorderThickness          1
+    ArrowColor               #60727F
+}
+
+' ── Modelos de dominio (azul) ─────────────────────────────────────
+skinparam class<<model>> {
+    HeaderBackgroundColor    #134C8F
+    BorderColor              #0E2743
+    FontColor                #FFFFFF
+    AttributeFontColor       #243242
+}
+
+' ── Repositorios (teal) ──────────────────────────────────────────
+skinparam class<<repository>> {
+    HeaderBackgroundColor    #00957F
+    BorderColor              #005450
+    FontColor                #FFFFFF
+    AttributeFontColor       #243242
+}
+
+' ── Casos de uso (ámbar) ─────────────────────────────────────────
+skinparam class<<usecase>> {
+    HeaderBackgroundColor    #C4881A
+    BorderColor              #8C5A00
+    FontColor                #FFFFFF
+    AttributeFontColor       #243242
+}
+
+' ── ViewModels (violeta) ─────────────────────────────────────────
+skinparam class<<viewmodel>> {
+    HeaderBackgroundColor    #bba1e7
+    BorderColor              #42199E
+    FontColor                #FFFFFF
+    AttributeFontColor       #243242
+}
+
+skinparam arrow {
+    Color                    #60727F
+    FontColor                #455563
+    FontSize                 10
+}
+
+' ══════════════════════════════════════════════════════════════════
+'  1. MODELOS DE DOMINIO
+' ══════════════════════════════════════════════════════════════════
+
+package "Modelos de dominio" #E3ECF8 {
+
+    class Folder <<model>> {
+        + id: String
+        + name: String
+        + parentId: String?
+    }
+
+    class Pack <<model>> {
+        + id: String
+        + title: String
+        + folderId: String
+    }
+
+    class Question <<model>> {
+        + id: String
+        + text: String
+        + difficulty: DifficultyLevel
+    }
+
+    class Option <<model>> {
+        + id: String
+        + questionId: String
+        + isCorrect: Boolean
+    }
+
+    class Attempt <<model>> {
+        + id: String
+        + mode: AttemptMode
+        + status: AttemptStatus
+        + score: Int
+    }
+
+    class AttemptAnswer <<model>> {
+        + attemptId: String
+        + questionId: String
+        + isCorrect: Boolean
+    }
+
+    class PackStats <<model>> {
+        + packId: String
+        + progressPercent: Int
+        + totalSessions: Int
+    }
+
+    class QuestionStats <<model>> {
+        + questionId: String
+        + masteryLevel: QuestionMasteryLevel
+        + masteryScore: Float
+    }
+
+    class UserProfile <<model>> {
+        + id: String
+        + displayName: String
+    }
+
+    class UserRank <<model>> {
+        + userId: String
+        + currentRank: UserRank
+        + mmr: Float
+        + totalXp: Long
+    }
+}
+
+' ══════════════════════════════════════════════════════════════════
+'  2. REPOSITORIOS
+' ══════════════════════════════════════════════════════════════════
+
+package "Repositorios" #E0F9F4 {
+
+    interface FolderRepository <<repository>> {
+        + observeByParent(parentId): Flow<List<Folder>>
+        + createFolder(...): Folder
+        + deleteFolder(folderId)
+    }
+
+    interface PackRepository <<repository>> {
+        + observeAllWithQuestionCounts(): Flow<List<...>>
+        + getWithQuestions(packId): List<Question>
+        + createPack(...): Pack
+    }
+
+    interface QuestionRepository <<repository>> {
+        + observeByPack(packId): Flow<List<Question>>
+        + createQuestion(...): Question
+        + reorderQuestions(packId, ids)
+    }
+
+    interface AttemptRepository <<repository>> {
+        + observeActivePackProgress(mode): Flow<...>
+        + getAttempt(id): Attempt?
+        + saveAnswer(answer: AttemptAnswer)
+        + finalizeAttempt(id)
+    }
+
+    interface UserStatsRepository <<repository>> {
+        + observePackStats(packId): Flow<PackStats>
+        + observeQuestionStats(packId): Flow<List<QuestionStats>>
+        + getUserStatsSnapshot(): UserStatsSnapshot
+    }
+
+    interface UserRankRepository <<repository>> {
+        + observeUserRank(): Flow<UserRank?>
+        + updateRank(state: UserRankState)
+    }
+
+    interface UserPreferencesRepository <<repository>> {
+        + observePreferences(): Flow<UserPreferences>
+        + updateLanguage(code)
+        + updateTheme(mode)
+    }
+
+    interface ImportExportRepository <<repository>> {
+        + exportFolder(folderId): ExportedUQuizFile
+        + importFromJson(json): ImportResult
+    }
+}
+
+' ══════════════════════════════════════════════════════════════════
+'  3. CASOS DE USO
+' ══════════════════════════════════════════════════════════════════
+
+package "Casos de uso" #FFF3D6 {
+
+    class ComputeGameScoreUseCase <<usecase>> {
+        + invoke(answers, timeBudgets): Int
+    }
+
+    class FinalizeGameAttemptUseCase <<usecase>> {
+        + invoke(attemptId)
+    }
+
+    class ShowReminderNotificationUseCase <<usecase>> {
+        + invoke()
+    }
+}
+
+' ══════════════════════════════════════════════════════════════════
+'  4. VIEWMODELS
+' ══════════════════════════════════════════════════════════════════
+
+package "ViewModels" #EBE2FF {
+
+    class HomeViewModel <<viewmodel>> {
+        + uiState: StateFlow<HomeUiState>
+    }
+
+    class StudySessionViewModel <<viewmodel>> {
+        + uiState: StateFlow<StudySessionUiState>
+        + onAnswerSelected(optionId)
+    }
+
+    class GameSessionViewModel <<viewmodel>> {
+        + uiState: StateFlow<GameSessionUiState>
+        + onAnswerSelected(optionId)
+    }
+
+    class UserStatsViewModel <<viewmodel>> {
+        + uiState: StateFlow<UserStatsUiState>
+    }
+
+    class PreferencesViewModel <<viewmodel>> {
+        + uiState: StateFlow<PreferencesUiState>
+        + onLanguageChange(code)
+    }
+}
+
+' ══════════════════════════════════════════════════════════════════
+'  RELACIONES — DOMINIO
+' ══════════════════════════════════════════════════════════════════
+
+Folder        "1" *--> "N"  Pack          : contiene
+Pack          "N" o--> "M"  Question      : agrupa
+Question      "1" *--> "N"  Option        : tiene
+Attempt       "1" *--> "N"  AttemptAnswer : registra
+UserProfile   "1" --   "1"  UserRank      : clasifica
+PackStats          -->       Pack          : sobre
+QuestionStats      -->       Question      : sobre
+
+' ══════════════════════════════════════════════════════════════════
+'  RELACIONES — REPOSITORIOS → MODELOS
+' ══════════════════════════════════════════════════════════════════
+
+FolderRepository       ..>  Folder        : gestiona
+PackRepository         ..>  Pack          : gestiona
+QuestionRepository     ..>  Question      : gestiona
+AttemptRepository      ..>  Attempt       : gestiona
+UserStatsRepository    ..>  PackStats     : devuelve
+UserStatsRepository    ..>  QuestionStats : devuelve
+UserRankRepository     ..>  UserRank      : gestiona
+
+' ══════════════════════════════════════════════════════════════════
+'  RELACIONES — VIEWMODELS → REPOSITORIOS / CASOS DE USO
+' ══════════════════════════════════════════════════════════════════
+
+HomeViewModel          ..>  PackRepository          : usa
+HomeViewModel          ..>  AttemptRepository       : usa
+StudySessionViewModel  ..>  AttemptRepository       : usa
+GameSessionViewModel   ..>  AttemptRepository       : usa
+GameSessionViewModel   ..>  ComputeGameScoreUseCase : usa
+UserStatsViewModel     ..>  UserStatsRepository     : usa
+PreferencesViewModel   ..>  UserPreferencesRepository : usa
+
+' ══════════════════════════════════════════════════════════════════
+'  RELACIONES — CASOS DE USO → REPOSITORIOS
+' ══════════════════════════════════════════════════════════════════
+
+ComputeGameScoreUseCase       ..>  AttemptRepository       : consulta
+FinalizeGameAttemptUseCase    ..>  AttemptRepository       : finaliza
+ShowReminderNotificationUseCase ..> UserPreferencesRepository : lee
+
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+left to right direction
+
+actor Usuario
+actor "Sistema Android" as Android
+
+rectangle UQuiz {
+  usecase "Gestionar contenido" as UC1
+  usecase "Crear o editar preguntas" as UC2
+  usecase "Iniciar Study" as UC3
+  usecase "Iniciar Game" as UC4
+  usecase "Consultar estadísticas" as UC5
+  usecase "Configurar preferencias" as UC6
+  usecase "Importar contenido" as UC7
+  usecase "Exportar contenido" as UC8
+  usecase "Programar recordatorios" as UC9
+}
+
+Usuario --> UC1
+Usuario --> UC2
+Usuario --> UC3
+Usuario --> UC4
+Usuario --> UC5
+Usuario --> UC6
+Usuario --> UC7
+Usuario --> UC8
+Usuario --> UC9
+
+Android --> UC9
+
+UC1 ..> UC2 : <<include>>
+
+@enduml

@@ -27,10 +27,6 @@ class ComputeGameScoreUseCase {
 
                 val score =
                     when {
-                        isTimeout -> {
-                            -(TIMEOUT_PENALTY * difficultyWeight)
-                        }
-
                         answer.isCorrect -> {
                             val speedScore =
                                 answer.timeLimitMs
@@ -42,6 +38,10 @@ class ComputeGameScoreUseCase {
                             // speedMultiplier ∈ [0.5, 2.0]: lento → ×0.5, rápido → ×2.0
                             val speedMultiplier = 0.5f + speedScore * 1.5f
                             CORRECT_BASE * speedMultiplier * difficultyWeight
+                        }
+
+                        isTimeout -> {
+                            -(TIMEOUT_PENALTY * difficultyWeight)
                         }
 
                         else -> {

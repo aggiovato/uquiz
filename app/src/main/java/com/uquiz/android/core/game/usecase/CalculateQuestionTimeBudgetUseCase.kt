@@ -28,8 +28,8 @@ class CalculateQuestionTimeBudgetUseCase {
 
         val totalChars = questionWithOptions.question.text.length +
             questionWithOptions.options.sumOf { it.text.length }
-        // +1 s por cada 100 caracteres adicionales, tope de 15 s
-        val lengthBonusMs = ((totalChars / 100) * 1_000L).coerceAtMost(15_000L)
+        // +1,5 s por cada 100 caracteres, tope de 25 s — más margen para preguntas con texto extenso
+        val lengthBonusMs = ((totalChars / 100) * 1_500L).coerceAtMost(25_000L)
 
         val calculatedMs = baseDurationMs + lengthBonusMs
 
