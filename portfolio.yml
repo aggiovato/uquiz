@@ -1,0 +1,7 @@
+# What aggiovato/portfolio shows about uQuiz, sent when a version is tagged (release.yml).
+# Only facts that do not depend on the language; the version and its day are added by the workflow.
+# Contract: https://github.com/aggiovato/portfolio/blob/main/.github/workflows/project-release.yml
+slug: uquiz # the case study it updates
+status: completed # active | completed | prototype | paused
+links:
+  code: https://github.com/aggiovato/uquiz
