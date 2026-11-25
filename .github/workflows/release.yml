@@ -1,0 +1,20 @@
+name: Release
+
+# A version tag (vX.Y.Z, matching versionName in app/build.gradle.kts) marks a finished version of
+# the app. The APK is not on Google Play, so the tag is the release: it tells the portfolio, whose
+# case study then shows that version (portfolio.yml has the rest).
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+jobs:
+  portfolio:
+    name: Tell the portfolio
+    uses: aggiovato/portfolio/.github/workflows/project-release.yml@main
+    with:
+      version: ${{ github.ref_name }}
+    secrets:
+      PORTFOLIO_TOKEN: ${{ secrets.PORTFOLIO_TOKEN }}
